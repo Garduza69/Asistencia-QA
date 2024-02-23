@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Muli&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: -50px 0; /* Margen negativo para compensar en la parte superior e inferior */
+    background-color: rgb(67, 115, 161);
+    color: white;
+    font-family: monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: auto; /* Hacer la página desplegable */
+    margin: 0;
+}
+
+.contenedor {
+   
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 20px 40px;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 500px;
+    position: absolute; /* Cambiar a posicionamiento absoluto */
+    top: 50px; /* Agregar un margen superior */
+    left: 50%; /* Centrar horizontalmente */
+    transform: translateX(-50%); /* Ajustar para centrar horizontalmente */
+    
+    
+}
+
+.contenedor h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.contenedor a {
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+}
+
+.btn {
+    cursor: pointer;
+    display: inline-block;
+    width: 100%;
+    background: lightblue;
+    padding: 15px;
+    font-family: inherit;
+    font-size: 16px;
+    border: 0;
+    border-radius: 5px;
+}
+
+.btn:focus {
+    outline: 0;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.texto {
+    margin-top: 30px;
+}
+
+.form-control {
+    position: relative;
+    margin: 20px 0 40px;
+    width: 300px;
+}
+
+.form-control input {
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid white;
+    display: block;
+    width: 100%;
+    padding: 15px 0;
+    font-size: 18px;
+    color: white;
+}
+
+.form-control input:focus,
+.form-control input:valid {
+    outline: 0;
+    border-bottom-color: lightblue;
+}
+
+.form-control label {
+    position: absolute;
+    top: 15px;
+    left: 0;
+}
+
+.form-control label span {
+    display: inline-block;
+    font-size: 22px;
+    min-width: 5px;
+    transition: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.form-control input:focus + label span,
+.form-control input:valid + label span {
+    color: lightblue;
+    transform: translateY(-30px);
+}
+
+/* Estilo para el selector de tipo de usuario */
+.form-control select {
+    background-color:rgba(0, 0, 0, 0.8); /* Color de fondo con opacidad */
+    border: none;
+    border-bottom: 2px solid rgb(97, 97, 97);
+    display: block;
+    width: 100%;
+    padding: 15px 0;
+    font-size: 18px;
+    color: rgb(255, 255, 255);
+    appearance: none; /* Eliminar la apariencia predeterminada del selector */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 12L2 4h16z"/></svg>'); /* Agregar una flecha personalizada */
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 16px;
+    cursor: pointer;
+}
+
+/* Estilo cuando el selector está enfocado */
+.form-control select:focus {
+    outline: 0;
+    border-bottom-color: lightblue;
+}
+
+
+
+
+
+
+
+
+
+
+
+
