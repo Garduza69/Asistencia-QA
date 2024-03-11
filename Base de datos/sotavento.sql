@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-03-2024 a las 22:57:37
+-- Tiempo de generación: 12-03-2024 a las 00:55:22
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.0.28
 
@@ -58,9 +58,9 @@ INSERT INTO `alumnos` (`alumno_id`, `nombre`, `primer_apellido`, `segundo_apelli
 
 CREATE TABLE `asistencia` (
   `id` int(11) NOT NULL,
-  `asistencia` varchar(10) NOT NULL,
-  `id_horario` varchar(255) NOT NULL,
-  `id_alumno` varchar(255) NOT NULL
+  `asistencia` varchar(50) NOT NULL,
+  `horario_id` int(11) NOT NULL,
+  `alumno_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -100,18 +100,19 @@ CREATE TABLE `grupos` (
   `fecha_alta` timestamp NOT NULL DEFAULT current_timestamp(),
   `fecha_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `usuario_alta` varchar(255) DEFAULT NULL,
-  `usuario_actualizacion` varchar(255) DEFAULT NULL
+  `usuario_actualizacion` varchar(255) DEFAULT NULL,
+  `materia_id` int(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `grupos`
 --
 
-INSERT INTO `grupos` (`grupo_id`, `clave_grupo`, `nombre`, `semestre_id`, `facultad_id`, `fecha_alta`, `fecha_actualizacion`, `usuario_alta`, `usuario_actualizacion`) VALUES
-(1, '8510', NULL, 1, 1, '2024-03-01 01:02:00', '2024-03-01 01:08:22', 'admin', 'admin'),
-(2, '7510', NULL, 2, 1, '2024-03-06 19:49:25', '2024-03-06 19:49:25', NULL, NULL),
-(3, '9510', NULL, 3, 1, '2024-03-06 19:49:25', '2024-03-06 19:49:25', NULL, NULL),
-(4, '6510', NULL, 4, 1, '2024-03-06 19:51:43', '2024-03-06 19:51:43', NULL, NULL);
+INSERT INTO `grupos` (`grupo_id`, `clave_grupo`, `nombre`, `semestre_id`, `facultad_id`, `fecha_alta`, `fecha_actualizacion`, `usuario_alta`, `usuario_actualizacion`, `materia_id`) VALUES
+(1, '8510', NULL, 1, 1, '2024-03-01 01:02:00', '2024-03-11 23:20:23', 'admin', 'admin', 1),
+(2, '7510', NULL, 2, 1, '2024-03-06 19:49:25', '2024-03-11 23:20:23', NULL, NULL, 2),
+(3, '9510', NULL, 3, 1, '2024-03-06 19:49:25', '2024-03-11 23:20:23', NULL, NULL, 3),
+(4, '6510', NULL, 4, 1, '2024-03-06 19:51:43', '2024-03-11 23:20:23', NULL, NULL, 4);
 
 -- --------------------------------------------------------
 
@@ -279,18 +280,19 @@ CREATE TABLE `semestres` (
   `fecha_alta` timestamp NOT NULL DEFAULT current_timestamp(),
   `fecha_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `usuario_alta` varchar(255) DEFAULT NULL,
-  `usuario_actualizacion` varchar(255) DEFAULT NULL
+  `usuario_actualizacion` varchar(255) DEFAULT NULL,
+  `id_materia` int(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `semestres`
 --
 
-INSERT INTO `semestres` (`semestre_id`, `nombre`, `facultad_id`, `fecha_alta`, `fecha_actualizacion`, `usuario_alta`, `usuario_actualizacion`) VALUES
-(1, 'Octavo Semestre', 1, '2024-03-01 00:54:43', '2024-03-01 01:01:54', 'admin', 'admin'),
-(2, 'Septimo semestre', 1, '2024-03-06 19:42:03', '2024-03-06 19:42:38', NULL, NULL),
-(3, 'Noveno semestre', 1, '2024-03-06 19:42:03', '2024-03-06 19:42:38', NULL, NULL),
-(4, 'Sexto semestre', 1, '2024-03-06 19:51:08', '2024-03-06 19:51:08', NULL, NULL);
+INSERT INTO `semestres` (`semestre_id`, `nombre`, `facultad_id`, `fecha_alta`, `fecha_actualizacion`, `usuario_alta`, `usuario_actualizacion`, `id_materia`) VALUES
+(1, 'Octavo Semestre', 1, '2024-03-01 00:54:43', '2024-03-01 01:01:54', 'admin', 'admin', 0),
+(2, 'Septimo semestre', 1, '2024-03-06 19:42:03', '2024-03-06 19:42:38', NULL, NULL, 0),
+(3, 'Noveno semestre', 1, '2024-03-06 19:42:03', '2024-03-06 19:42:38', NULL, NULL, 0),
+(4, 'Sexto semestre', 1, '2024-03-06 19:51:08', '2024-03-06 19:51:08', NULL, NULL, 0);
 
 --
 -- Índices para tablas volcadas
@@ -307,8 +309,8 @@ ALTER TABLE `alumnos`
 --
 ALTER TABLE `asistencia`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `id_horario` (`id_horario`) USING BTREE,
-  ADD UNIQUE KEY `id_alumno` (`id_alumno`) USING BTREE;
+  ADD UNIQUE KEY `horario_id` (`horario_id`),
+  ADD UNIQUE KEY `alumno_id` (`alumno_id`);
 
 --
 -- Indices de la tabla `facultades`
@@ -321,6 +323,7 @@ ALTER TABLE `facultades`
 --
 ALTER TABLE `grupos`
   ADD PRIMARY KEY (`grupo_id`),
+  ADD UNIQUE KEY `materia_id` (`materia_id`) USING BTREE,
   ADD KEY `semestre_id` (`semestre_id`),
   ADD KEY `facultad_id` (`facultad_id`);
 
@@ -437,11 +440,19 @@ ALTER TABLE `semestres`
 --
 
 --
+-- Filtros para la tabla `asistencia`
+--
+ALTER TABLE `asistencia`
+  ADD CONSTRAINT `asistencia_ibfk_1` FOREIGN KEY (`horario_id`) REFERENCES `horarios` (`horario_id`),
+  ADD CONSTRAINT `asistencia_ibfk_2` FOREIGN KEY (`alumno_id`) REFERENCES `alumnos` (`alumno_id`);
+
+--
 -- Filtros para la tabla `grupos`
 --
 ALTER TABLE `grupos`
   ADD CONSTRAINT `grupos_ibfk_1` FOREIGN KEY (`semestre_id`) REFERENCES `semestres` (`semestre_id`),
-  ADD CONSTRAINT `grupos_ibfk_2` FOREIGN KEY (`facultad_id`) REFERENCES `facultades` (`facultad_id`);
+  ADD CONSTRAINT `grupos_ibfk_2` FOREIGN KEY (`facultad_id`) REFERENCES `facultades` (`facultad_id`),
+  ADD CONSTRAINT `grupos_ibfk_3` FOREIGN KEY (`materia_id`) REFERENCES `materias` (`materia_id`);
 
 --
 -- Filtros para la tabla `historial_asistencia`
