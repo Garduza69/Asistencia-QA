@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="main2.css" />
+    <title>Perfil de Alumno</title>
+    <style>
+        /* Estilos personalizados para los botones y enlaces */
+        .btn, a.btn {
+            cursor: pointer;
+            display: inline-block;
+            width: 102%;
+            background: lightblue;
+            padding: 15px;
+            font-family: system-ui;
+            font-size: 16px;
+            border: 0;
+            border-radius: 100px;
+            text-decoration: none;
+            color: black; /* Cambiar el color del texto a negro */
+            text-align: center; /* Centrar el texto */
+        }
+
+        /* Estilos al pasar el ratón sobre los botones y enlaces */
+        .btn:hover, a.btn:hover {
+            background: lightcyan;
+    
+        }
+
+    </style>
+</head>
+<body>
+    <h1 id="welcome-message"></h1>
+    <h2>Menú</h2>
+    <ul>
+        <button class="btn" onclick="consultaAsistencia()">Consulta de Asistencia</button>
+        <br>
+        <br>
+        <a class="btn" href="horario_sistemas.pdf" download>Descargar Horario</a>
+        <br>
+        <br>
+        <!-- Utilizamos un enlace <a> para dirigir al usuario a generarqr.html -->
+        <a class="btn" href="generarqr.html">Generar QR</a>
+    </ul>
+
+    <script>
+        window.onload = function() {
+            // Hacer una solicitud AJAX a alumno.php para obtener el mensaje de bienvenida
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("welcome-message").innerHTML = this.responseText;
+                }
+            };
+            xhttp.open("GET", "alumno.php", true);
+            xhttp.send();
+        };
+
+        function consultaAsistencia() {
+            // Aquí puedes agregar la lógica para la consulta de asistencia
+            alert("Funcionalidad de consulta de asistencia en desarrollo.");
+        }
+
+        function generarQR() {
+            // Aquí puedes agregar la lógica para generar el QR
+            alert("Funcionalidad de generación de QR en desarrollo.");
+        }
+    </script>
+</body>
+</html>

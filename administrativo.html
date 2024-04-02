@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="main2.css" />
+    <title>Perfil Administrativo</title>
+</head>
+<body>
+    <h1 id="welcome-message"></h1>
+    <h2>Menú</h2>
+    <ul>
+        <button class="btn" onclick="generarReporte()">Generar Reporte</button>
+        <br>
+        <br>
+        <button class="btn" onclick="consulta()">Consulta</button>
+        <br>
+        <br>
+        <button class="btn" onclick="notificaciones()">Notificaciones</button>
+        <br>
+    </ul>
+
+    <script>
+        window.onload = function() {
+            // Hacer una solicitud AJAX a administrativo.php para obtener el mensaje de bienvenida
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("welcome-message").innerHTML = this.responseText;
+                }
+            };
+            xhttp.open("GET", "alumno.php", true);
+            xhttp.send();
+        };
+
+        function generarReporte() {
+            // Aquí puedes agregar la lógica para generar el reporte
+            alert("Funcionalidad de generar reporte en desarrollo.");
+        }
+
+        function consulta() {
+            // Aquí puedes agregar la lógica para la consulta
+            alert("Funcionalidad de consulta en desarrollo.");
+        }
+
+        function notificaciones() {
+            // Aquí puedes agregar la lógica para las notificaciones
+            alert("Funcionalidad de notificaciones en desarrollo.");
+        }
+    </script>
+</body>
+</html>

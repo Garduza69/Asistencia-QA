@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generar QR</title>
+    <link rel="stylesheet" href="main2.css" />
+    <style>
+        body {
+            font: 14px sans-serif;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="form-group">
+            <p class="mt-3">Selecciona la materia:</p>
+            <select id="materia" name="materia">
+                <!-- Opciones de materias se cargarán aquí mediante AJAX -->
+            </select>
+            <p class="mt-3">Este es tu código:</p>
+            <div id="qr_code"></div>
+            <hr/>
+            <p class="mt-3">El profesor debe escanearlo para registrar tu asistencia.</p>               
+        </div>
+    </div>
+    <!-- Script para cargar dinámicamente la lista de materias y generar código QR -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            // Cargar lista de materias
+            $.ajax({
+                type: 'GET',
+                url: 'obtener_materias.php',
+                success: function(data){
+                    $('#materia').html(data);
+                }
+            });
+            // Generar código QR al seleccionar una materia
+            $('#materia').change(function(){
+                var materiaSeleccionada = $(this).val();
+                $.ajax({
+                    type: 'GET',
+                    url: 'generate_qr.php',
+                    data: { materia_id: materiaSeleccionada }, // Enviar el materia_id seleccionado
+                    success: function(data){
+                        var qr_image = $('<img>').attr('src', data);
+                        $('#qr_code').html(qr_image);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
