@@ -1,3 +1,6 @@
+//Contador de códigos QR leídos
+let contadorCodigos = 0;
+
 //crea elemento
 const video = document.createElement("video");
 
@@ -64,9 +67,10 @@ qrcode.callback = (token) => {
     console.log(token);
     Swal.fire(token)
     activarSonido();
-    //encenderCamara();    
+    //encenderCamara();
     cerrarCamara();
-    registrarAsistencia(token);    
+    registrarAsistencia(token);
+    contadorCodigos++; // Incrementar el contador
 
   }
 };
@@ -82,13 +86,46 @@ function registrarAsistencia(token) {
       return response.text();
     })
     .then(data => {
-      // Verificar si se recibió el mensaje de éxito
+      // Mostrar mensaje de éxito o de error utilizando SweetAlert2
       if (data.trim() === 'Registro de asistencia exitoso.') {
-        // Mostrar mensaje de éxito utilizando SweetAlert2
-        Swal.fire('Éxito', data.trim(), 'success');
+        Swal.fire({
+          title: 'Éxito',
+          text: data.trim(),
+          icon: 'success',
+          customClass: 'custom-swal',
+          showCancelButton: true,
+          confirmButtonText: 'Seguir leyendo códigos QR',
+          cancelButtonText: 'cerrar clase',
+          showCloseButton: true,
+          footer: `<span>Códigos QR leídos: ${contadorCodigos}</span>`
+
+        }).then((result) => {
+          if (result.isConfirmed) {
+            encenderCamara();
+          } else {
+            ejecutarFaltasPHP(); // Ejecutar faltas.php
+          }
+        });
       } else {
-        // Mostrar mensaje de error utilizando SweetAlert2
         Swal.fire('Error', data.trim(), 'error');
+        Swal.fire({
+          title: 'Error',
+          text: data.trim(),
+          icon: 'error',
+          customClass: 'custom-swal',
+          showCancelButton: true,
+          confirmButtonText: 'Seguir leyendo códigos QR',
+          cancelButtonText: 'Cerrar clase',
+          showCloseButton: true,
+          footer: `<span>Códigos QR leídos: ${contadorCodigos}</span>`
+
+        }).then((result) => {
+          if (result.isConfirmed) {
+            encenderCamara();
+          } else {
+            ejecutarFaltasPHP(); // Ejecutar faltas.php
+          }
+        });
       }
     })
     .catch(error => {
@@ -97,8 +134,28 @@ function registrarAsistencia(token) {
       // Capturar y mostrar cualquier error de red
       console.error('Error al realizar la solicitud:', error);
     });
+
 }
 
+// Función para ejecutar faltas.php
+function ejecutarFaltasPHP() {
+  fetch('faltas.php')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error al ejecutar faltas.php');
+      }
+      // Redirigir a la página docente.html una vez que se complete la ejecución de faltas.php
+      window.location.href = 'docente.html';
+    })
+    .catch(error => {
+      console.error('Error al ejecutar faltas.php:', error);
+    });
+}
+
+// Evento para mostrar la cámara sin el botón 
+window.addEventListener('load', (e) => {
+  encenderCamara();
+});
 
 
 

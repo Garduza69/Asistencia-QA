@@ -81,6 +81,7 @@ if (isset($_SESSION['email'])) {
                                 if ($conn->affected_rows > 0) {
                                     // Si se actualizó correctamente, muestra el mensaje de éxito
                                     echo "Registro de asistencia exitoso.";
+                                    
                                 } else {
                                     // Si no se actualizó ningún registro (ya se había registrado la asistencia previamente), muestra un mensaje informativo
                                     echo "La asistencia ya ha sido registrada para este alumno y esta materia hoy.";
@@ -118,4 +119,6 @@ if (isset($_SESSION['email'])) {
 // Cerrar la conexión
 $conn->close();
 ?>
+
+
 

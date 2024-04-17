@@ -3,7 +3,7 @@
         'name' => 'tecnickcom/tcpdf',
         'pretty_version' => '6.3.2',
         'version' => '6.3.2.0',
-        'reference' => null,
+        'reference' => NULL,
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -217,7 +217,7 @@
         'tecnickcom/tcpdf' => array(
             'pretty_version' => '6.3.2',
             'version' => '6.3.2.0',
-            'reference' => null,
+            'reference' => NULL,
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

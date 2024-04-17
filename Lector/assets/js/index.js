@@ -64,8 +64,7 @@ qrcode.callback = (token) => {
     console.log(token);
     Swal.fire(token)
     activarSonido();
-    //encenderCamara();    
-    cerrarCamara();
+    encenderCamara();    
     registrarAsistencia(token);    
 
   }
