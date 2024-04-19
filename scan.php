@@ -72,23 +72,36 @@ if (isset($_SESSION['email'])) {
                             // Obtener la fecha actual
                             $fecha_actual = date("Y-m-d");
 
-                            // Preparar la consulta para actualizar la tabla asistencia
-                            $sql_update = "UPDATE asistencia SET asistencia = 1 WHERE materia_id = '$materia_id' AND alumno_id = '$alumno_id' AND fecha_alta = '$fecha_actual'";
+                            // Verificar si la asistencia es NULL o 0
+                            $sql_check_attendance = "SELECT asistencia FROM asistencia WHERE materia_id = '$materia_id' AND alumno_id = '$alumno_id' AND fecha_alta = '$fecha_actual'";
+                            $result_check_attendance = $conn->query($sql_check_attendance);
+                            if ($result_check_attendance->num_rows > 0) {
+                                $row_attendance = $result_check_attendance->fetch_assoc();
+                                $attendance = $row_attendance['asistencia'];
+                                if ($attendance === null) {
+                                    // Preparar la consulta para actualizar la tabla asistencia
+                                    $sql_update = "UPDATE asistencia SET asistencia = 1 WHERE materia_id = '$materia_id' AND alumno_id = '$alumno_id' AND fecha_alta = '$fecha_actual' ";
 
-                            // Ejecutar la consulta de actualización
-                            if ($conn->query($sql_update) === TRUE) {
-                                // Verificar si se actualizó algún registro
-                                if ($conn->affected_rows > 0) {
-                                    // Si se actualizó correctamente, muestra el mensaje de éxito
-                                    echo "Registro de asistencia exitoso.";
-                                    
-                                } else {
+                                    // Ejecutar la consulta de actualización
+                                    if ($conn->query($sql_update) === TRUE) {
+                                        // Verificar si se actualizó algún registro
+                                        if ($conn->affected_rows > 0) {
+                                            // Si se actualizó correctamente, muestra el mensaje de éxito
+                                            echo "Registro de asistencia exitoso.";
+                                        } 
+                                    } else {
+                                        // Si ocurrió un error al actualizar, devuelve el mensaje de error de MySQL
+                                        echo "Error: " . $conn->error;
+                                    }
+                                } elseif($attendance == 1){
                                     // Si no se actualizó ningún registro (ya se había registrado la asistencia previamente), muestra un mensaje informativo
                                     echo "La asistencia ya ha sido registrada para este alumno y esta materia hoy.";
                                 }
+                                else{
+                                    echo "La clase ya ha sido cerrada.";
+                                }
                             } else {
-                                // Si ocurrió un error al actualizar, devuelve el mensaje de error de MySQL
-                                echo "Error: " . $conn->error;
+                                echo "Error: No se pudo verificar la asistencia.";
                             }
                         } else {
                             echo "Error: No se encontró un alumno asociado al usuario.";
