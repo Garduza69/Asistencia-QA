@@ -1,6 +1,6 @@
 <?php
 // Incluir el archivo de conexión a la base de datos
-require('conexion.php');
+require('conexion2.php');
 
 // Query para obtener las materias desde la base de datos
 $mat = "select nombre from materias;";

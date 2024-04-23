@@ -1,6 +1,6 @@
 <?php
 require('./fpdf.php');
-require('conexion.php');
+require('conexion2.php');
 
 $pdf = new FPDF();
 

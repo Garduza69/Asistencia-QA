@@ -1,6 +1,6 @@
 <?php
 require('./fpdf.php');
-require('conexion.php');
+require('conexion2.php');
 $facultad = $_GET['facultad'];
 $materia = $_GET['materia'];
 $mes = $_GET['mes'];
