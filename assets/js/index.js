@@ -157,6 +157,16 @@ window.addEventListener('load', (e) => {
   encenderCamara();
 });
 
+// evento que evita que el navegador guarde el caché
+window.addEventListener('pageshow', function(event) {
+  window.history.pushState(null, null, document.URL);
+});
+
+//Evento que ejecuta la función de faltas cuando el usuario retrocede la página desde el navegador o con el botón del celular
+window.addEventListener('popstate', function(event) {
+  ejecutarFaltasPHP();
+});
+
 
 
 
