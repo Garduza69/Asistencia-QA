@@ -1,3 +1,4 @@
+
 <?php
 // Configuración de la base de datos
 $servername = "localhost"; // Cambia localhost por el servidor de tu base de datos
@@ -47,67 +48,80 @@ if (isset($_SESSION['email'])) {
                 $token = $_GET['token'];
 
                 // Consultar la materia asociada al token en la tabla codigos_qr
-                $sql_select = "SELECT materia_id, id_usuario FROM codigos_qr WHERE token = '$token'";
+                $sql_select = "SELECT materia_id, id_usuario, used FROM codigos_qr WHERE token = '$token'";
                 $result_select = $conn->query($sql_select);
 
                 // Verificar si se encontró el token en la base de datos
                 if ($result_select->num_rows > 0) {
-                    // Obtener el materia_id y el id_usuario asociados al token
+                    // Obtener el materia_id, el id_usuario y used asociados al token
                     $row_select = $result_select->fetch_assoc();
                     $materia_id = $row_select['materia_id'];
                     $id_usuario = $row_select['id_usuario'];
+                    $used = $row_select['used'];
 
-                    // Verificar si la materia del token coincide con alguna de las materias que imparte el profesor
-                    if (in_array($materia_id, $materias_imparte)) {
-                        // Consultar el alumno_id asociado al id_usuario en la tabla alumnos
-                        $sql_alumno = "SELECT alumno_id FROM alumnos WHERE id_usuario = '$id_usuario'";
-                        $result_alumno = $conn->query($sql_alumno);
+                    //verificar si el código ya fue usado
+                    if($used == 0){
+                        
 
-                        // Verificar si se encontró un alumno asociado al id_usuario
-                        if ($result_alumno->num_rows > 0) {
-                            // Obtener el alumno_id
-                            $row_alumno = $result_alumno->fetch_assoc();
-                            $alumno_id = $row_alumno['alumno_id'];
+                        // Verificar si la materia del token coincide con alguna de las materias que imparte el profesor
+                        if (in_array($materia_id, $materias_imparte)) {
+                            // Consultar el alumno_id asociado al id_usuario en la tabla alumnos
+                            $sql_alumno = "SELECT alumno_id FROM alumnos WHERE id_usuario = '$id_usuario'";
+                            $result_alumno = $conn->query($sql_alumno);
 
-                            // Obtener la fecha actual
-                            $fecha_actual = date("Y-m-d");
+                            // Verificar si se encontró un alumno asociado al id_usuario
+                            if ($result_alumno->num_rows > 0) {
+                                // Obtener el alumno_id
+                                $row_alumno = $result_alumno->fetch_assoc();
+                                $alumno_id = $row_alumno['alumno_id'];
 
-                            // Verificar si la asistencia es NULL o 0
-                            $sql_check_attendance = "SELECT asistencia FROM asistencia WHERE materia_id = '$materia_id' AND alumno_id = '$alumno_id' AND fecha_alta = '$fecha_actual'";
-                            $result_check_attendance = $conn->query($sql_check_attendance);
-                            if ($result_check_attendance->num_rows > 0) {
-                                $row_attendance = $result_check_attendance->fetch_assoc();
-                                $attendance = $row_attendance['asistencia'];
-                                if ($attendance === null) {
-                                    // Preparar la consulta para actualizar la tabla asistencia
-                                    $sql_update = "UPDATE asistencia SET asistencia = 1 WHERE materia_id = '$materia_id' AND alumno_id = '$alumno_id' AND fecha_alta = '$fecha_actual' ";
+                                // Obtener la fecha actual
+                                $fecha_actual = date("Y-m-d");
 
-                                    // Ejecutar la consulta de actualización
-                                    if ($conn->query($sql_update) === TRUE) {
-                                        // Verificar si se actualizó algún registro
-                                        if ($conn->affected_rows > 0) {
-                                            // Si se actualizó correctamente, muestra el mensaje de éxito
-                                            echo "Registro de asistencia exitoso.";
-                                        } 
-                                    } else {
-                                        // Si ocurrió un error al actualizar, devuelve el mensaje de error de MySQL
-                                        echo "Error: " . $conn->error;
+                                // Verificar si la asistencia es NULL o 0
+                                $sql_check_attendance = "SELECT asistencia FROM asistencia WHERE materia_id = '$materia_id' AND alumno_id = '$alumno_id' AND fecha_alta = '$fecha_actual'";
+                                $result_check_attendance = $conn->query($sql_check_attendance);
+                                if ($result_check_attendance->num_rows > 0) {
+                                    $row_attendance = $result_check_attendance->fetch_assoc();
+                                    $attendance = $row_attendance['asistencia'];
+                                    if ($attendance === null) {
+                                        // Preparar la consulta para actualizar la tabla asistencia
+                                        $sql_update = "UPDATE asistencia SET asistencia = 1 WHERE materia_id = '$materia_id' AND alumno_id = '$alumno_id' AND fecha_alta = '$fecha_actual' ";
+
+                                        // Ejecutar la consulta de actualización
+                                        if ($conn->query($sql_update) === TRUE) {
+                                            // Verificar si se actualizó algún registro
+                                            if ($conn->affected_rows > 0) {
+                                                // Si se actualizó correctamente, muestra el mensaje de éxito
+                                                echo "Registro de asistencia exitoso.";
+                                            } 
+                                        } else {
+                                            // Si ocurrió un error al actualizar, devuelve el mensaje de error de MySQL
+                                            echo "Error: " . $conn->error;
+                                        }
+                                    } elseif($attendance == 1){
+                                        // Si no se actualizó ningún registro (ya se había registrado la asistencia previamente), muestra un mensaje informativo
+                                        echo "La asistencia ya ha sido registrada para este alumno y esta materia hoy.";
                                     }
-                                } elseif($attendance == 1){
-                                    // Si no se actualizó ningún registro (ya se había registrado la asistencia previamente), muestra un mensaje informativo
-                                    echo "La asistencia ya ha sido registrada para este alumno y esta materia hoy.";
-                                }
-                                else{
-                                    echo "La clase ya ha sido cerrada.";
+                                    else{
+                                        echo "La clase ya ha sido cerrada.";
+                                    }
+                                } else {
+                                    echo "Error: No se pudo verificar la asistencia.";
                                 }
                             } else {
-                                echo "Error: No se pudo verificar la asistencia.";
+                                echo "Error: No se encontró un alumno asociado al usuario.";
                             }
                         } else {
-                            echo "Error: No se encontró un alumno asociado al usuario.";
+                            echo "Error: La materia asociada al token no coincide con las materias que imparte el profesor.";
                         }
-                    } else {
-                        echo "Error: La materia asociada al token no coincide con las materias que imparte el profesor.";
+                        // Actualizar el campo 'used' a 1
+                        $sql_update_used = "UPDATE codigos_qr SET used = 1 WHERE token = '$token'";
+                        $conn->query($sql_update_used);
+                    }else{
+                        if($used == 1){
+                        echo "Error: El código ya fue usado";// manda el mensaje si el código QR ya fue usado
+                        }
                     }
                 } else {
                     echo "Error: No se encontró ningún token asociado.";
@@ -132,6 +146,3 @@ if (isset($_SESSION['email'])) {
 // Cerrar la conexión
 $conn->close();
 ?>
-
-
-
