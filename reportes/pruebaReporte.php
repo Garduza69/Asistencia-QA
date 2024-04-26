@@ -2,8 +2,34 @@
 require('./fpdf.php');
 require('conexion2.php');
 
-$pdf = new FPDF();
+class PDFWithFooter extends FPDF {
+    // Pie de página
+    function Footer() {
+        // Posición a 1,5 cm desde abajo
+        $this->SetY(-13);
+        // Arial italic 8
+        $this->SetFont('Arial','I',9);
+        
+        // Establecer la zona horaria a México
+        date_default_timezone_set('America/Mexico_City');
+        
+        // Obtener la fecha de hoy en formato dd/mm/aaaa
+        $fecha_actual = date('d/m/Y');
+        
+        // Obtener la hora actual en formato 00:00:00 PM/AM
+        $hora_actual = date('h:i:s A');
+        
+        // Agregar la fecha actual al pie de página
+        $this->Cell(0, 15, utf8_decode($fecha_actual.'  '.$hora_actual), 0, 0, 'L');
+        $this->Cell(-320, 15, utf8_decode('Martires de Chicago No 205. Col. Tesoro' . '                          (921) 218 - 2311 / 218 - 2312 / 218 - 9180'), 0, 0, 'C');    
+        
+        $this->Cell(280, 15, utf8_decode('Coatzacoalcos, Ver.'), 0, 0, 'R');
+        
+        $this->Cell(0, 15, utf8_decode('Página ') . $this->PageNo(), 0, 0, 'R');
+    }
+}
 
+$pdf = new PDFWithFooter();
 $facultad = $_GET['facultad'];
 $grupo = $_GET['grupo'];
 $mes = $_GET['mes'];
@@ -54,6 +80,7 @@ if($consultaEncabezado->num_rows > 0){
     while ($fila = $consultaEncabezado->fetch_assoc()) {
         $pdf->AddPage("landscape");
         $pdf->AliasNbPages();
+
 		            // Configuración del logo
         $pdf->Image('UNAM.jpg', 15, 5, 20); //logo de la empresa, moverDerecha, moverAbajo, tamañoIMG
             // Título 1
@@ -105,7 +132,7 @@ if($consultaEncabezado->num_rows > 0){
 		
         //----------------------INICIO DE LA LISTA DE LOS ALUMNOS--------------------------------------
 		
-		$pdf->Cell(90, 12, utf8_decode('Matricula                         A l u m n o '), 1, 0, 'L', 0);
+		$pdf->Cell(90, 12, utf8_decode('      Matricula                         A l u m n o '), 1, 0, 'L', 0);
         $pdf->Cell(155, 12, utf8_decode(' '), 1, 0, 'C', 0);
 
 
@@ -129,11 +156,13 @@ if($consultaEncabezado->num_rows > 0){
                             alu.alumno_id
                     order by 2");
 
-        while ($alu = $consultaAlumnos->fetch_assoc()) {
+        $contador = 1;
+		while ($alu = $consultaAlumnos->fetch_assoc()) {
             
             $pdf->SetFont('Arial', '', 8);
+			
             // Imprime la matrícula y el nombre en la misma línea
-            $pdf->Cell(90, 5, $alu['matricula'] . "            " . $alu['nombre_completo'], 1, 0, 'L');
+            $pdf->Cell(90, 5, $contador++ . ".    " . $alu['matricula'] . "            " . $alu['nombre_completo'], 1, 0, 'L');
 
             for ($dia = 1; $dia <= 31; $dia++) {
                 $consultaAsistencia = $db->query("
@@ -226,13 +255,19 @@ if($consultaEncabezado->num_rows > 0){
 				
 		    
             }
+
+					
         }
+
 		
 		
     }
 	
-	// Pie de página
-        $pdf->Footer();
+	    if(isset($pdf->Footer)) {
+        $footer = $pdf->Footer;
+        $footer();
+    }
+	
 
 
     //echo "</ul>";
