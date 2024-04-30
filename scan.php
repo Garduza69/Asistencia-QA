@@ -1,4 +1,3 @@
-
 <?php
 // Configuración de la base de datos
 $servername = "localhost"; // Cambia localhost por el servidor de tu base de datos
@@ -61,7 +60,6 @@ if (isset($_SESSION['email'])) {
 
                     //verificar si el código ya fue usado
                     if($used == 0){
-                        
 
                         // Verificar si la materia del token coincide con alguna de las materias que imparte el profesor
                         if (in_array($materia_id, $materias_imparte)) {
@@ -88,61 +86,88 @@ if (isset($_SESSION['email'])) {
                                         // Preparar la consulta para actualizar la tabla asistencia
                                         $sql_update = "UPDATE asistencia SET asistencia = 1 WHERE materia_id = '$materia_id' AND alumno_id = '$alumno_id' AND fecha_alta = '$fecha_actual' ";
 
-                                        // Ejecutar la consulta de actualización
+                                         // Ejecutar la consulta de actualización
                                         if ($conn->query($sql_update) === TRUE) {
                                             // Verificar si se actualizó algún registro
                                             if ($conn->affected_rows > 0) {
                                                 // Si se actualizó correctamente, muestra el mensaje de éxito
-                                                echo "Registro de asistencia exitoso.";
-                                            } 
+                                                // Después de procesar el registro de asistencia con éxito
+                                                header("Location: send_email.php?token=$token&result=success");
+                                                exit;
+                                            }
+                                            
                                         } else {
                                             // Si ocurrió un error al actualizar, devuelve el mensaje de error de MySQL
-                                            echo "Error: " . $conn->error;
+                                            // En caso de error al procesar el registro de asistencia
+                                            header("Location: send_email.php?token=$token&result=error");
+                                            exit;
                                         }
                                     } elseif($attendance == 1){
                                         // Si no se actualizó ningún registro (ya se había registrado la asistencia previamente), muestra un mensaje informativo
-                                        echo "La asistencia ya ha sido registrada para este alumno y esta materia hoy.";
+                                        // En caso de asistencia ya registrada manda la siguiente notificación
+                                        header("Location: send_email.php?token=$token&result=registrado");
+                                        exit;
                                     }
                                     else{
-                                        echo "La clase ya ha sido cerrada.";
+                                        // En caso de que la clase ya fue cerrada manda la siguiente notificación
+                                        header("Location: send_email.php?token=$token&result=cerrado");
+                                        exit;
                                     }
                                 } else {
-                                    echo "Error: No se pudo verificar la asistencia.";
+                                    
+                                    // En caso de error al procesar el registro de asistencia
+                                    header("Location: send_email.php?token=$token&result=error");
+                                    exit;
                                 }
                             } else {
-                                echo "Error: No se encontró un alumno asociado al usuario.";
+                                //"Error: No se encontró un alumno asociado al usuario.";
+                                // En caso de error al procesar el registro de asistencia
+                                header("Location: send_email.php?token=$token&result=error");
+                                exit;
                             }
                         } else {
-                            echo "Error: La materia asociada al token no coincide con las materias que imparte el profesor.";
+                            // En caso de asistencia ya registrada manda la siguiente notificación
+                            header("Location: send_email.php?token=$token&result=materia");
+                            exit;
                         }
                         // Actualizar el campo 'used' a 1
                         $sql_update_used = "UPDATE codigos_qr SET used = 1 WHERE token = '$token'";
                         $conn->query($sql_update_used);
                     }else{
                         if($used == 1){
-                        echo "Error: El código ya fue usado";// manda el mensaje si el código QR ya fue usado
+                        // manda el mensaje si el código QR ya fue usado
+                        // En caso de que el código ya ha sido usado manda la siguiente notificación
+                            header("Location: send_email.php?token=$token&result=usado");
+                            exit;
                         }
                     }
                 } else {
-                    echo "Error: No se encontró ningún token asociado.";
+                    //"Error: No se encontró ningún token asociado.";
+                    // En caso de error al procesar el registro de asistencia
+                    header("Location: send_email.php?token=$token&result=error");
+                    exit;
                 }
             } else {
                 // Si no se proporciona un token, se devuelve un error
-                echo "Error: No se proporcionó un token.";
+                //"Error: No se proporcionó un token.";
+                // En caso de error al procesar el registro de asistencia
+                header("Location: send_email.php?token=$token&result=error");
+                exit;
             }
         } else {
             // Si no se encontró un profesor asociado al idUsuario, muestra un mensaje de error
-            echo "Error: No se encontró un profesor asociado al usuario.";
+            $mensaje_respuesta = "Error: No se encontró un profesor asociado al usuario.";
         }
     } else {
         // Si no se encontró un usuario con el correo proporcionado, muestra un mensaje de error
-        echo "Error: No se encontró un usuario con el correo proporcionado.";
+        $mensaje_respuesta = "Error: No se encontró un usuario con el correo proporcionado.";
     }
 } else {
     // Si el usuario no ha iniciado sesión, muestra un mensaje de error
-    echo "Error: El usuario no ha iniciado sesión.";
+    $mensaje_respuesta = "Error: El usuario no ha iniciado sesión.";
 }
 
 // Cerrar la conexión
 $conn->close();
+
 ?>
