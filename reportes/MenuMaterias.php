@@ -196,32 +196,32 @@ if($consultaEncabezado->num_rows > 0) {
 
         // Establecer la posición inicial del bloque
         $pdf->SetXY($x_inicio, $y_inicio);
-
+        $fechas_actuales = date('Y');
         // Obtener el número de días en el mes seleccionado
-        $numero_dias_mes = date('t', mktime(0, 0, 0, $mes, 1));
+        $numero_dias_mes = cal_days_in_month(CAL_GREGORIAN, $mes, $fechas_actuales); // Obtener el número de días en el mes
 
         // Tamaño de las celdas
         $ancho_celda = 5;
         $alto_celda = 5;
 
         // Determinar en qué día de la semana comienza el mes (1: Lunes, 7: Domingo)
-        $primer_dia_semana = date('N', strtotime(date('Y-m-01', mktime(0, 0, 0, $mes, 1))));
+        $primer_dia_semana = date('N', strtotime(date('Y-m-01', mktime(0, 0, 0, $mes, 1, $fechas_actuales))));
 
         // Crear una matriz de nombres de día de semana ajustada al inicio del mes
         $nombres_dias_semana = array('L', 'M', 'M', 'J', 'V', 'S', 'D');
-                for ($i = 0; $i < $primer_dia_semana - 1; $i++) {
-                    array_push($nombres_dias_semana, array_shift($nombres_dias_semana));
-                }
-
+        // Desplazar la matriz para que comience con el primer día del mes
+        for ($i = 1; $i < $primer_dia_semana; $i++) {
+            array_push($nombres_dias_semana, array_shift($nombres_dias_semana));
+        }
 
         // Establecer la posición inicial del bloque
         $pdf->SetXY($x_inicio, $y_inicio);
 
         // Iterar sobre los días del mes
         $pdf->SetFont('Arial', '', 6); // Establecer la fuente antes de imprimir los días
-                for ($dia = 1; $dia <= $numero_dias_mes; $dia++) {
+        for ($dia = 1; $dia <= $numero_dias_mes; $dia++) {
             // Obtener el nombre del día de la semana abreviado
-            $nombre_dia_semana = $nombres_dias_semana[date('N', strtotime(date('Y-m-' . $dia))) - 1];
+            $nombre_dia_semana = $nombres_dias_semana[($dia - 1) % 7];
 
             // Combinar el nombre del día de la semana con el día del mes
             $texto_a_mostrar = $nombre_dia_semana . sprintf("%02d", $dia); // Se agrega un cero si el día es menor de 10
@@ -235,7 +235,11 @@ if($consultaEncabezado->num_rows > 0) {
                 $x_inicio = $pdf->GetX() - 150.5;
                 $y_inicio += $alto_celda; // Mueve a la siguiente fila
                 $pdf->SetXY($x_inicio, $y_inicio); // Establece la nueva posición
+				
+		    
             }
+
+					
         }
     }
 		if(isset($pdf->Footer)) {
@@ -245,7 +249,7 @@ if($consultaEncabezado->num_rows > 0) {
 	
 
 } else {
-    echo "0 resultados";
+    //echo "0 resultados";
 }
 
 $pdf->Output('Lista de Asistencia de ' . $materia . '.pdf', 'I', true, 'UTF-8');
