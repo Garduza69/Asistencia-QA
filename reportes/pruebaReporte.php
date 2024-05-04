@@ -207,25 +207,25 @@ if($consultaEncabezado->num_rows > 0){
         $y_inicio = 70; // Establece la posición en el eje y
         $x = 153;
         $y = 67.5;
-        
+
         // Dibuja el texto en la posición especificada
         $pdf->Text($x, $y, utf8_decode('DIAS DE CLASES EN EL MES'));
 
         // Establecer la posición inicial del bloque
         $pdf->SetXY($x_inicio, $y_inicio);
-        $fechas_actuales = date('Y');
+
         // Obtener el número de días en el mes seleccionado
-        $numero_dias_mes = cal_days_in_month(CAL_GREGORIAN, $mes, $fechas_actuales); // Obtener el número de días en el mes
+        $numero_dias_mes = cal_days_in_month(CAL_GREGORIAN, $mes, 2024); // Obtener el número de días en el mes
 
         // Tamaño de las celdas
         $ancho_celda = 5;
         $alto_celda = 5;
 
         // Determinar en qué día de la semana comienza el mes (1: Lunes, 7: Domingo)
-        $primer_dia_semana = date('N', strtotime(date('Y-m-01', mktime(0, 0, 0, $mes, 1, $fechas_actuales))));
+        $primer_dia_semana = date('N', strtotime(date('Y-m-01', mktime(0, 0, 0, $mes, 1, 2024))));
 
         // Crear una matriz de nombres de día de semana ajustada al inicio del mes
-        $nombres_dias_semana = array('L', 'M', 'M', 'J', 'V', 'S', 'D');
+        $nombres_dias_semana = array('L', 'M', 'X', 'J', 'V', 'S', 'D');
         // Desplazar la matriz para que comience con el primer día del mes
         for ($i = 1; $i < $primer_dia_semana; $i++) {
             array_push($nombres_dias_semana, array_shift($nombres_dias_semana));
