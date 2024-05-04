@@ -1,12 +1,40 @@
 <?php
 require('./fpdf.php');
-require('conexion.php');
+require('conexion2.php');
 
-$pdf = new FPDF();
+class PDFWithFooter extends FPDF {
+    // Pie de página
+    function Footer() {
+        // Posición a 1,5 cm desde abajo
+        $this->SetY(-13);
+        // Arial italic 8
+        $this->SetFont('Arial','I',9);
+        
+        // Establecer la zona horaria a México
+        date_default_timezone_set('America/Mexico_City');
+        
+        // Obtener la fecha de hoy en formato dd/mm/aaaa
+        $fecha_actual = date('d/m/Y');
+        
+        // Obtener la hora actual en formato 00:00:00 PM/AM
+        $hora_actual = date('h:i:s A');
+        
+        // Agregar la fecha actual al pie de página
+        $this->Cell(0, 15, utf8_decode($fecha_actual.'  '.$hora_actual), 0, 0, 'L');
+        $this->Cell(-320, 15, utf8_decode('Martires de Chicago No 205. Col. Tesoro' . '                          (921) 218 - 2311 / 218 - 2312 / 218 - 9180'), 0, 0, 'C');    
+        
+        $this->Cell(280, 15, utf8_decode('Coatzacoalcos, Ver.'), 0, 0, 'R');
+        
+        $this->Cell(0, 15, utf8_decode('Página ') . $this->PageNo(), 0, 0, 'R');
+    }
+}
 
+$pdf = new PDFWithFooter();
 $facultad = $_GET['facultad'];
 $grupo = $_GET['grupo'];
 $mes = $_GET['mes'];
+
+$pdf->SetTitle($facultad, true);
 
 $consultaEncabezado = $db->query("SELECT 
             f.nombre AS nombre_facultad,
@@ -46,13 +74,13 @@ $consultaEncabezado = $db->query("SELECT
             g.clave_grupo,
             ma.materia_id
             order by 7");
-
 if($consultaEncabezado->num_rows > 0){
     
     //echo "<ul>";
     while ($fila = $consultaEncabezado->fetch_assoc()) {
         $pdf->AddPage("landscape");
         $pdf->AliasNbPages();
+
 		            // Configuración del logo
         $pdf->Image('UNAM.jpg', 15, 5, 20); //logo de la empresa, moverDerecha, moverAbajo, tamañoIMG
             // Título 1
@@ -79,60 +107,35 @@ if($consultaEncabezado->num_rows > 0){
         $pdf->Cell(100, 10, utf8_decode('CARRERAS: '. $fila['nombre_facultad']), 1, 0, 'L', 1);
         $pdf->Cell(40, 10, utf8_decode('CLAVE: 20181190/1'), 1, 0, 'L', 1);
 		$pdf->Cell(65, 10, utf8_decode('PERIODO:'), 1, 0, 'L', 1);
-        $pdf->Cell(70, 10, utf8_decode('/'. $fila['Docente']), 1, 1, 'C', 1);
+        $pdf->Cell(70, 10, utf8_decode('/ '. $fila['Docente']), 1, 1, 'C', 1);
 
         $pdf->Cell(100, 10, utf8_decode('MATERIA: '. $fila['nombre_materia']), 1, 0, 'L', 0);
         $pdf->Cell(40, 10, utf8_decode($fila['nombre_semestre']), 1, 0, 'L', 0);
         $pdf->Cell(65, 10, utf8_decode('GRUPO: '. $fila['cve_grupo']), 1, 0, 'L', 0);
+        // Guarda la posición actual
+        $x = $pdf->GetX();
+        $y = $pdf->GetY();
 
-        $pdf->Cell(70, 10, utf8_decode($fila['Mes']), 1, 1, 'C');
+        // Imprime la celda existente
+        $pdf->Cell(30, 10, utf8_decode($fila['Mes']), 1, 0, 'C', 0);
 
+        // Establece la posición para la nueva celda (a la derecha)
+        $pdf->SetXY($x + 30, $y);
+
+        // Imprime la nueva celda
+        $pdf->Cell(40, 10, utf8_decode('Firma: '), 1, 1, 'L', 0); 
         $pdf->Ln(5); // Salto de línea
-            // Título 4
+        // Título 4
         $pdf->Cell(100, 1, utf8_decode('Calificacion Minima Aprobatoria para Ordinario:   6'), 0, 1, 'C', 0);
         $pdf->Ln(5); // Salto de línea
         //------------------------------FIN DEL ENCABEZADO----------------------------------------------
 		
         //----------------------INICIO DE LA LISTA DE LOS ALUMNOS--------------------------------------
 		
-		$pdf->Cell(90, 12, utf8_decode('Matricula                         A l u m n o '), 1, 0, 'L', 0);
+		$pdf->Cell(90, 12, utf8_decode('      Matricula                         A l u m n o '), 1, 0, 'L', 0);
         $pdf->Cell(155, 12, utf8_decode(' '), 1, 0, 'C', 0);
 
-        $x = 153; // Coordenada X
-        $y = 67.5;  // Coordenada Y
 
-        // Dibuja el texto en la posición especificada
-        $pdf->Text($x, $y, utf8_decode('DIAS DE CLASES EN EL MES'));
-
-        // Obtener el primer día del mes actual
-        $primer_dia_mes = date('Y-m-01');
-        // Definir la posición inicial
-        $x = $pdf->GetX() - 154.5;
-        $y = $pdf->GetY() + 6.0;
-
-        // Definir la fuente
-        $pdf->SetFont('Arial', '', 6);
-		
-        // Iterar sobre los días del mes
-		// Iterar sobre los días del mes
-        for ($dia = 1; $dia <= 31; $dia++) {
-            // Obtener el nombre del día de la semana abreviado
-            $nombre_dia_semana = array('L', 'M', 'M', 'J', 'V', 'S', 'D')[date('N', strtotime(date('Y-m-' . $dia))) - 1];
-
-            // Combinar el nombre del día de la semana con el día del mes
-            $texto_a_mostrar = $nombre_dia_semana . sprintf("%02d", $dia); // Se agrega un cero si el día es menor de 10
-
-            // Agregar el rectángulo con el texto
-            $pdf->Rect($x, $y, 4, 5); // Relleno del cuadro
-            $pdf->Text($x, $y + 4.4, $texto_a_mostrar); // El texto se ajusta para centrarlo dentro del rectángulo
-
-            // Mover la posición al siguiente rectángulo
-            $x += 4.8; // Ajusta la posición para el siguiente día
-            if ($x > 400) { // Si se alcanza el borde derecho de la página, regresa a la izquierda
-                $x = $pdf->GetX() - 150.5;
-                $y += 6; // Mueve a la siguiente fila
-            }
-        }
 		
 		$pdf->Cell(18, 12, utf8_decode('Total Faltas'), 1, 0, 'C', 0);
         $pdf->Cell(20, 12, utf8_decode('Calificacion'), 1, 0, 'C', 0);
@@ -153,11 +156,13 @@ if($consultaEncabezado->num_rows > 0){
                             alu.alumno_id
                     order by 2");
 
-        while ($alu = $consultaAlumnos->fetch_assoc()) {
+        $contador = 1;
+		while ($alu = $consultaAlumnos->fetch_assoc()) {
             
             $pdf->SetFont('Arial', '', 8);
+			
             // Imprime la matrícula y el nombre en la misma línea
-            $pdf->Cell(90, 5, $alu['matricula'] . "            " . $alu['nombre_completo'], 1, 0, 'L');
+            $pdf->Cell(90, 5, $contador++ . ".    " . $alu['matricula'] . "            " . $alu['nombre_completo'], 1, 0, 'L');
 
             for ($dia = 1; $dia <= 31; $dia++) {
                 $consultaAsistencia = $db->query("
@@ -165,7 +170,6 @@ if($consultaEncabezado->num_rows > 0){
                                 asis.fecha_alta,
                                 max(case when asis.asistencia = 1 then '*'
                                         when asis.asistencia = 2 then '*'
-										when asis.asistencia = Null then ' '
                                     else '/' end) as reporteAsis
                         from asistencia asis
                         where month(asis.fecha_alta) = $mes
@@ -194,9 +198,76 @@ if($consultaEncabezado->num_rows > 0){
             $pdf->Cell(20, 5, utf8_decode(' '), 1, 0, 'C', false);
 
             $pdf->Ln();
+			
         
         }
+		// Posición inicial del bloque de celdas
+		// Posición inicial del bloque de celdas
+        $x_inicio = 100; // Establece la posición en el eje x
+        $y_inicio = 70; // Establece la posición en el eje y
+        $x = 153;
+        $y = 67.5;
+
+        // Dibuja el texto en la posición especificada
+        $pdf->Text($x, $y, utf8_decode('DIAS DE CLASES EN EL MES'));
+
+        // Establecer la posición inicial del bloque
+        $pdf->SetXY($x_inicio, $y_inicio);
+
+        // Obtener el número de días en el mes seleccionado
+        $numero_dias_mes = cal_days_in_month(CAL_GREGORIAN, $mes, 2024); // Obtener el número de días en el mes
+
+        // Tamaño de las celdas
+        $ancho_celda = 5;
+        $alto_celda = 5;
+
+        // Determinar en qué día de la semana comienza el mes (1: Lunes, 7: Domingo)
+        $primer_dia_semana = date('N', strtotime(date('Y-m-01', mktime(0, 0, 0, $mes, 1, 2024))));
+
+        // Crear una matriz de nombres de día de semana ajustada al inicio del mes
+        $nombres_dias_semana = array('L', 'M', 'X', 'J', 'V', 'S', 'D');
+        // Desplazar la matriz para que comience con el primer día del mes
+        for ($i = 1; $i < $primer_dia_semana; $i++) {
+            array_push($nombres_dias_semana, array_shift($nombres_dias_semana));
+        }
+
+        // Establecer la posición inicial del bloque
+        $pdf->SetXY($x_inicio, $y_inicio);
+
+        // Iterar sobre los días del mes
+        $pdf->SetFont('Arial', '', 6); // Establecer la fuente antes de imprimir los días
+        for ($dia = 1; $dia <= $numero_dias_mes; $dia++) {
+            // Obtener el nombre del día de la semana abreviado
+            $nombre_dia_semana = $nombres_dias_semana[($dia - 1) % 7];
+
+            // Combinar el nombre del día de la semana con el día del mes
+            $texto_a_mostrar = $nombre_dia_semana . sprintf("%02d", $dia); // Se agrega un cero si el día es menor de 10
+
+            // Agregar la celda con el texto
+            $pdf->Cell($ancho_celda, $alto_celda, $texto_a_mostrar, 1, 0, 'C'); // Relleno de la celda y alineación del texto
+
+            // Mover la posición al siguiente rectángulo
+            $x_inicio += $ancho_celda; // Ajusta la posición para el siguiente día
+            if ($x_inicio > 400) { // Si se alcanza el borde derecho de la página, regresa a la izquierda
+                $x_inicio = $pdf->GetX() - 150.5;
+                $y_inicio += $alto_celda; // Mueve a la siguiente fila
+                $pdf->SetXY($x_inicio, $y_inicio); // Establece la nueva posición
+				
+		    
+            }
+
+					
+        }
+
+		
+		
     }
+	
+	    if(isset($pdf->Footer)) {
+        $footer = $pdf->Footer;
+        $footer();
+    }
+	
 
 
     //echo "</ul>";
@@ -206,7 +277,7 @@ if($consultaEncabezado->num_rows > 0){
 
 
     
-$pdf->Output('Prueba3.pdf', 'I');
+$pdf->Output('Listas de Asistencia.pdf', 'I');
 
 $db->close();
 
