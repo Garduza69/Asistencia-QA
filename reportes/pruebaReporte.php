@@ -30,50 +30,99 @@ class PDFWithFooter extends FPDF {
 }
 
 $pdf = new PDFWithFooter();
-$facultad = $_GET['facultad'];
-$grupo = $_GET['grupo'];
-$mes = $_GET['mes'];
+$origen = $_GET['opcion'];
 
-$pdf->SetTitle($facultad, true);
+if($origen == 2){
+        $facultad = $_GET['facultad'];
+        $grupo = $_GET['grupo'];
+        $mes = $_GET['mes'];
+        $pdf->SetTitle($facultad, true);
 
-$consultaEncabezado = $db->query("SELECT 
+        $consultaEncabezado = $db->query("SELECT 
+                    f.nombre AS nombre_facultad,
+                    ma.nombre AS nombre_materia,
+                    s.nombre AS nombre_semestre,
+                    g.clave_grupo AS cve_grupo,
+                    CONCAT(p.nombre, ' ', p.primer_apellido, ' ', p.segundo_apellido) AS Docente,
+                    MAX(CASE WHEN MONTH(asis.fecha_alta) = 1 THEN 'Enero'
+                            WHEN MONTH(asis.fecha_alta) = 2 THEN 'Febrero'
+                            WHEN MONTH(asis.fecha_alta) = 3 THEN 'Marzo'
+                            WHEN MONTH(asis.fecha_alta) = 4 THEN 'Abril'
+                            WHEN MONTH(asis.fecha_alta) = 5 THEN 'Mayo'
+                            WHEN MONTH(asis.fecha_alta) = 6 THEN 'Junio'
+                            WHEN MONTH(asis.fecha_alta) = 7 THEN 'Julio'
+                            WHEN MONTH(asis.fecha_alta) = 8 THEN 'Agosto'
+                            WHEN MONTH(asis.fecha_alta) = 9 THEN 'Septiembre'
+                            WHEN MONTH(asis.fecha_alta) = 10 THEN 'Octubre'
+                            WHEN MONTH(asis.fecha_alta) = 11 THEN 'Noviembre'
+                            WHEN MONTH(asis.fecha_alta) = 12 THEN 'Diciembre'
+                        END) AS Mes,
+                    ma.materia_id
+                    FROM asistencia asis
+                    join matricula m on asis.alumno_id = m.alumno_id
+                    JOIN profesores p ON m.profesor_id = p.profesor_id
+                    JOIN materias ma ON m.materia_id = ma.materia_id
+                    JOIN grupos g ON m.grupo_id = g.grupo_id
+                    JOIN facultades f ON g.facultad_id = f.facultad_id
+                    JOIN semestres s ON g.semestre_id = s.semestre_id
+                    WHERE MONTH(asis.fecha_alta) = ".$mes."
+                        AND g.clave_grupo = '".$grupo."'
+                        AND f.nombre = '".$facultad."'
+
+                    GROUP BY 
+                    f.nombre,
+                    CONCAT(p.nombre, ' ', p.primer_apellido, ' ', p.segundo_apellido),
+                    ma.nombre,
+                    s.nombre,
+                    g.clave_grupo,
+                    ma.materia_id
+                    order by 7");
+} else if ($origen == 1) {
+
+    $facultad = $_GET['facultad'];
+    $materia = $_GET['materia'];
+    $mes = $_GET['mes'];
+    $pdf->SetTitle($facultad, true);
+
+    $consultaEncabezado = $db->query("SELECT 
             f.nombre AS nombre_facultad,
             ma.nombre AS nombre_materia,
             s.nombre AS nombre_semestre,
             g.clave_grupo AS cve_grupo,
             CONCAT(p.nombre, ' ', p.primer_apellido, ' ', p.segundo_apellido) AS Docente,
-            MAX(CASE WHEN MONTH(asis.fecha_alta) = 1 THEN 'Enero'
-                     WHEN MONTH(asis.fecha_alta) = 2 THEN 'Febrero'
-                     WHEN MONTH(asis.fecha_alta) = 3 THEN 'Marzo'
-                     WHEN MONTH(asis.fecha_alta) = 4 THEN 'Abril'
-                     WHEN MONTH(asis.fecha_alta) = 5 THEN 'Mayo'
-                     WHEN MONTH(asis.fecha_alta) = 6 THEN 'Junio'
-                     WHEN MONTH(asis.fecha_alta) = 7 THEN 'Julio'
-                     WHEN MONTH(asis.fecha_alta) = 8 THEN 'Agosto'
-                     WHEN MONTH(asis.fecha_alta) = 9 THEN 'Septiembre'
-                     WHEN MONTH(asis.fecha_alta) = 10 THEN 'Octubre'
-                     WHEN MONTH(asis.fecha_alta) = 11 THEN 'Noviembre'
-                     WHEN MONTH(asis.fecha_alta) = 12 THEN 'Diciembre'
+            MAX(CASE 
+                    WHEN MONTH(asis.fecha_alta) = 1 THEN 'Enero'
+                    WHEN MONTH(asis.fecha_alta) = 2 THEN 'Febrero'
+                    WHEN MONTH(asis.fecha_alta) = 3 THEN 'Marzo'
+                    WHEN MONTH(asis.fecha_alta) = 4 THEN 'Abril'
+                    WHEN MONTH(asis.fecha_alta) = 5 THEN 'Mayo'
+                    WHEN MONTH(asis.fecha_alta) = 6 THEN 'Junio'
+                    WHEN MONTH(asis.fecha_alta) = 7 THEN 'Julio'
+                    WHEN MONTH(asis.fecha_alta) = 8 THEN 'Agosto'
+                    WHEN MONTH(asis.fecha_alta) = 9 THEN 'Septiembre'
+                    WHEN MONTH(asis.fecha_alta) = 10 THEN 'Octubre'
+                    WHEN MONTH(asis.fecha_alta) = 11 THEN 'Noviembre'
+                    WHEN MONTH(asis.fecha_alta) = 12 THEN 'Diciembre'
                 END) AS Mes,
-            ma.materia_id
+                ma.materia_id
             FROM asistencia asis
-            join matricula m on asis.alumno_id = m.alumno_id
+            JOIN matricula m ON asis.alumno_id = m.alumno_id
             JOIN profesores p ON m.profesor_id = p.profesor_id
             JOIN materias ma ON m.materia_id = ma.materia_id
             JOIN grupos g ON m.grupo_id = g.grupo_id
             JOIN facultades f ON g.facultad_id = f.facultad_id
             JOIN semestres s ON g.semestre_id = s.semestre_id
             WHERE MONTH(asis.fecha_alta) = ".$mes."
-                AND g.clave_grupo = '".$grupo."'
-				AND f.nombre = '".$facultad."'
+                AND f.nombre = '".$facultad."'
+                AND ma.nombre = '".$materia."'
             GROUP BY 
-            f.nombre,
-            CONCAT(p.nombre, ' ', p.primer_apellido, ' ', p.segundo_apellido),
-            ma.nombre,
-            s.nombre,
-            g.clave_grupo,
-            ma.materia_id
-            order by 7");
+                f.nombre,
+                CONCAT(p.nombre, ' ', p.primer_apellido, ' ', p.segundo_apellido),
+                ma.nombre,
+                s.nombre,
+                g.clave_grupo,
+                ma.materia_id");
+}
 if($consultaEncabezado->num_rows > 0){
     
     //echo "<ul>";
