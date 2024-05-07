@@ -1,9 +1,9 @@
 <?php
 // Configuración de la base de datos
 $servername = "localhost"; // Cambia localhost por el servidor de tu base de datos
-$username = "u712195824_sistema"; // Cambia tu_usuario por el nombre de usuario de tu base de datos
+$username = "u712195824_sistema2"; // Cambia tu_usuario por el nombre de usuario de tu base de datos
 $password = "Cruzazul443"; // Cambia tu_contraseña por la contraseña de tu base de datos
-$dbname = "u712195824_sistema"; // Cambia login por el nombre de tu base de datos
+$dbname = "u712195824_sistema2"; // Cambia login por el nombre de tu base de datos
 
 // Inicia la sesión
 session_start();
@@ -21,7 +21,7 @@ if (isset($_SESSION['email'])) {
     }
 
     // Consultar el idUsuario asociado al correo del usuario actual
-    $sql_usuario = "SELECT idUsuario FROM usuario WHERE email = '$email_usuario'";
+    $sql_usuario = "SELECT idUsuario FROM usuario WHERE Email = '$email_usuario'";
     $result_usuario = $conn->query($sql_usuario);
     if ($result_usuario->num_rows > 0) {
         $row_usuario = $result_usuario->fetch_assoc();
@@ -84,9 +84,10 @@ if (isset($_SESSION['email'])) {
                                     $attendance = $row_attendance['asistencia'];
                                     if ($attendance === null) {
                                         // Preparar la consulta para actualizar la tabla asistencia
-                                        $sql_update = "UPDATE asistencia SET asistencia = 1 WHERE materia_id = '$materia_id' AND alumno_id = '$alumno_id' AND fecha_alta = '$fecha_actual' ";
+                                        $sql_update = "UPDATE asistencia SET asistencia = 1, fecha_actualizacion = CONVERT_TZ(CURRENT_TIMESTAMP, '+00:00', '-06:00'), usuario_actualizacion = '$email_usuario'
+                                        WHERE materia_id = '$materia_id' AND alumno_id = '$alumno_id' AND fecha_alta = '$fecha_actual' ";
 
-                                         // Ejecutar la consulta de actualización
+                                        // Ejecutar la consulta de actualización
                                         if ($conn->query($sql_update) === TRUE) {
                                             // Verificar si se actualizó algún registro
                                             if ($conn->affected_rows > 0) {
@@ -171,3 +172,4 @@ if (isset($_SESSION['email'])) {
 $conn->close();
 
 ?>
+

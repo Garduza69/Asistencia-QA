@@ -1,71 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="main2.css" />
-    <title>Perfil de Alumno</title>
-    <style>
-        /* Estilos personalizados para los botones y enlaces */
-        .btn, a.btn {
-            cursor: pointer;
-            display: inline-block;
-            width: 102%;
-            background: lightblue;
-            padding: 15px;
-            font-family: system-ui;
-            font-size: 16px;
-            border: 0;
-            border-radius: 100px;
-            text-decoration: none;
-            color: black; /* Cambiar el color del texto a negro */
-            text-align: center; /* Centrar el texto */
-        }
+  <meta charset="utf-8">
+  <title>Sotavento - Alumno</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="" name="keywords">
+  <meta content="" name="description">
 
-        /* Estilos al pasar el ratón sobre los botones y enlaces */
-        .btn:hover, a.btn:hover {
-            background: lightcyan;
-    
-        }
+  <!-- Favicons -->
+  <link href="img/logoUS.png" rel="icon">
+  <link href="img/logoUS.png" rel="apple-touch-icon">
 
-    </style>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,700|Open+Sans:300,300i,400,400i,700,700i" rel="stylesheet">
+
+  <!-- Bootstrap CSS File -->
+  <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Libraries CSS Files -->
+  <link href="lib/animate/animate.min.css" rel="stylesheet">
+  <link href="lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <link href="lib/ionicons/css/ionicons.min.css" rel="stylesheet">
+  <link href="lib/magnific-popup/magnific-popup.css" rel="stylesheet">
+
+  <!-- Main Stylesheet File -->
+  <link href="css/style.css" rel="stylesheet">
+
+  <!-- Custom Stylesheet for Logo -->
+  <style>
+#logo h1 a {
+  display: inline-block;
+  width: 150px; /* Nueva anchura */
+  height: 70px; /* Nueva altura */
+  background-image: url('img/sotavento.png');
+  background-size: contain; /* O ajusta según tu preferencia */
+  background-repeat: no-repeat;
+  text-indent: -9999px;
+}
+  </style>
+
+  <!-- =======================================================
+    Theme Name: Avilon
+    Theme URL: https://bootstrapmade.com/avilon-bootstrap-landing-page-template/
+    Author: BootstrapMade.com
+    License: https://bootstrapmade.com/license/
+  ======================================================= -->
 </head>
+
 <body>
-    <h1 id="welcome-message"></h1>
-    <h2>Menú</h2>
-    <ul>
-        <button class="btn" onclick="consultaAsistencia()">Consulta de Asistencia</button>
-        <br>
-        <br>
-        <a class="btn" href="horario_sistemas.pdf" download>Descargar Horario</a>
-        <br>
-        <br>
-        <!-- Utilizamos un enlace <a> para dirigir al usuario a generarqr.html -->
-        <a class="btn" href="generarqr.html">Generar QR</a>
-    </ul>
 
-    <script>
-        window.onload = function() {
-            // Hacer una solicitud AJAX a alumno.php para obtener el mensaje de bienvenida
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    document.getElementById("welcome-message").innerHTML = this.responseText;
-                }
-            };
-            xhttp.open("GET", "alumno.php", true);
-            xhttp.send();
+  <!--==========================
+    Header
+  ============================-->
+  <header id="header">
+    <div class="container">
+
+          
+
+      <nav id="nav-menu-container">
+        <ul class="nav-menu">
+          <li class="menu-active"><a href="auth.php">Cerrar sesión</a></li>
+          <li class="menu-has-children"><a href="">acciones</a>
+            <ul>
+                <li class="menu-active"><a href="#" onclick="consultaAsistencia()">Consulta de Asistencia</a></li>
+                <li class="menu-active"><a href="horario_sistemas.pdf" download>Descargar Horario</a></li>
+                <li class="menu-active"><a href="generarqr.html">Generar QR</a></li>
+            </ul>
+          <li class="menu-has-children"><a href="">Contacto</a>
+            <ul>
+              <li class="menu-has-children"><a href="#">¿Quienes somos?</a>
+                <ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#contact">Contacto</a></li>
+        </ul>
+      </nav><!-- #nav-menu-container -->
+    </div>
+  </header><!-- #header -->
+
+  <!--==========================
+    Intro Section
+  ============================-->
+  <section id="intro">
+    <br>
+    <br>
+    <div class="intro-text">
+        <h2 id="welcome-message"><a class="scrollto"></a></h2>
+      <h2>Menú</h2>
+      <p>Los mejores alumnos del mundo</p>
+      <a href="#" onclick="consultaAsistencia()" class="btn-get-started scrollto">Consulta de Asistencia</a>
+        <a href="horario_sistemas.pdf" download class="btn-get-started scrollto">Descargar Horario</a>
+        <a href="generarqr.html" class="btn-get-started scrollto">Generar QR</a>
+    </div>
+
+
+
+  </section><!-- #intro -->
+
+
+
+  <!--==========================
+    Footer
+  ============================-->
+
+
+  <!-- JavaScript Libraries -->
+  <script src="lib/jquery/jquery.min.js"></script>
+  <script src="lib/jquery/jquery-migrate.min.js"></script>
+  <script src="lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="lib/easing/easing.min.js"></script>
+  <script src="lib/wow/wow.min.js"></script>
+  <script src="lib/superfish/hoverIntent.js"></script>
+  <script src="lib/superfish/superfish.min.js"></script>
+  <script src="lib/magnific-popup/magnific-popup.min.js"></script>
+
+  <!-- Contact Form JavaScript File -->
+  <script src="contactform/contactform.js"></script>
+
+  <!-- Template Main Javascript File -->
+  <script src="js/main.js"></script>
+  <script>
+    window.onload = function() {
+        // Hacer una solicitud AJAX a alumno.php para obtener el mensaje de bienvenida
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("welcome-message").innerHTML = this.responseText;
+            }
         };
+        xhttp.open("GET", "alumno.php", true);
+        xhttp.send();
+    };
 
-        function consultaAsistencia() {
-            // Aquí puedes agregar la lógica para la consulta de asistencia
-            alert("Funcionalidad de consulta de asistencia en desarrollo.");
-        }
+    function consultaAsistencia() {
+        // Aquí puedes agregar la lógica para la consulta de asistencia
+        alert("Funcionalidad de consulta de asistencia en desarrollo.");
+    }
 
-        function generarQR() {
-            // Aquí puedes agregar la lógica para generar el QR
-            alert("Funcionalidad de generación de QR en desarrollo.");
-        }
-    </script>
+    function generarQR() {
+        // Aquí puedes agregar la lógica para generar el QR
+        alert("Funcionalidad de generación de QR en desarrollo.");
+    }
+</script>
+
 </body>
 </html>

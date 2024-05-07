@@ -1,10 +1,9 @@
 <?php
 // Configuración de la base de datos
 $servername = "localhost"; // Cambia localhost por el servidor de tu base de datos
-$username = "u712195824_sistema"; // Cambia tu_usuario por el nombre de usuario de tu base de datos
+$username = "u712195824_sistema2"; // Cambia tu_usuario por el nombre de usuario de tu base de datos
 $password = "Cruzazul443"; // Cambia tu_contraseña por la contraseña de tu base de datos
-$dbname = "u712195824_sistema"; // Cambia login por el nombre de tu base de datos
-
+$dbname = "u712195824_sistema2"; // Cambia login por el nombre de tu base de datos
 // Inicia la sesión
 session_start();
 
@@ -48,7 +47,7 @@ if (isset($_SESSION['email'])) {
             // Iterar sobre las materias que imparte el profesor
             foreach ($materias_imparte as $materia_id) {
                 // Preparar la consulta para actualizar la tabla asistencia
-                $sql_update = "UPDATE asistencia SET asistencia = 0 WHERE materia_id = '$materia_id' AND fecha_alta = '$fecha_actual' AND asistencia IS NULL";
+                $sql_update = "UPDATE asistencia SET asistencia = 0, fecha_actualizacion = CONVERT_TZ(CURRENT_TIMESTAMP, '+00:00', '-06:00'), usuario_actualizacion = '$email_usuario' WHERE materia_id = '$materia_id' AND fecha_alta = '$fecha_actual' AND asistencia IS NULL";
 
             }
             $conn->query($sql_update); 
