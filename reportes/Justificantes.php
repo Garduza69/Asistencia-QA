@@ -136,13 +136,6 @@
                 <input type="date" name="dia" id="dia">
             </div>
         </div>
-        <div class="seleccionar-turnos">  
-            <label for="turno">Turno:</label>
-            <select name="turno" id="turno">
-                <option value="Matutino">Matutino</option>
-                <option value="Vespertino">Vespertino</option>
-            </select>
-        </div>
         <div class="seleccionar-dia">
             <label for="dia_seleccionado">Día seleccionado:</label>
             <input type="text" name="dia_seleccionado" id="dia_seleccionado" readonly  required>
@@ -155,59 +148,74 @@
         </form>
     </div>
 
-<script>
-    // Obtener el botón de generar lista
-    const botonGenerarLista = document.getElementById('boton-generar-lista');
+    <script>
+// Obtener el botón de generar lista
+const botonGenerarLista = document.getElementById('boton-generar-lista');
 
-    // Agregar un event listener para el clic en el botón
-    botonGenerarLista.addEventListener('click', function() {
-        // Mostrar una confirmación al usuario
-        const confirmacion = confirm("¿Están correctos los datos seleccionados? ¿Desea continuar?");
-		
-        // Si el usuario presiona Aceptar, validar campos requeridos y enviar el formulario
-        if (confirmacion) {
-            // Obtener todos los campos requeridos
-            const camposRequeridos = document.querySelectorAll('[required]');
+// Agregar un event listener para el clic en el botón
+botonGenerarLista.addEventListener('click', function() {
+    // Mostrar una confirmación al usuario
+    const confirmacion = confirm("¿Están correctos los datos seleccionados? ¿Desea continuar?");
+    
+    // Si el usuario presiona Aceptar, validar campos requeridos y enviar el formulario
+    if (confirmacion) {
+        // Obtener todos los campos requeridos
+        const camposRequeridos = document.querySelectorAll('[required]');
 
-            // Variable para verificar si todos los campos están completos
-            let camposCompletos = true;
+        // Variable para verificar si todos los campos están completos
+        let camposCompletos = true;
 
-            // Iterar sobre los campos requeridos para verificar si están completos
-            camposRequeridos.forEach(function(campo) {
-                if (!campo.value.trim()) { // Comprobar si el campo está vacío
-                    alert('Completa este Campo: ' + campo.previousElementSibling.textContent);
-                    camposCompletos = false; // Cambiar el estado de camposCompletos
-                }
-            });
-
-            // Si todos los campos están completos, enviar el formulario
-            if (camposCompletos) {
-                document.getElementById('formulario-justificante').submit();
+        // Iterar sobre los campos requeridos para verificar si están completos
+        camposRequeridos.forEach(function(campo) {
+            if (!campo.value.trim()) { // Comprobar si el campo está vacío
+                alert('Completa este Campo: ' + campo.previousElementSibling.textContent);
+                camposCompletos = false; // Cambiar el estado de camposCompletos
             }
+        });
+
+        // Si todos los campos están completos, enviar el formulario
+        if (camposCompletos) {
+            document.getElementById('formulario-justificante').submit();
         }
-    });
+    }
+});
 
-    // Obtener el elemento del calendario
-    const calendario = document.getElementById('dia');
+// Obtener el elemento del calendario
+const calendario = document.getElementById('dia');
 
-    // Agregar un event listener para detectar cambios en el calendario
-    calendario.addEventListener('change', () => {
-        // Obtener la fecha seleccionada en el calendario (en formato local)
-        const fechaSeleccionadaLocal = new Date(calendario.value);
+// Obtener la fecha actual
+const fechaActual = new Date();
 
-        // Convertir la fecha seleccionada a formato UTC para evitar diferencias de zona horaria
-        const fechaSeleccionadaUTC = new Date(Date.UTC(
-            fechaSeleccionadaLocal.getUTCFullYear(),
-            fechaSeleccionadaLocal.getUTCMonth(),
-            fechaSeleccionadaLocal.getUTCDate()
-        ));
+// Calcular la fecha límite (3 días hábiles atrás)
+const fechaLimite = new Date();
+fechaLimite.setDate(fechaActual.getDate() - 4);
 
+// Agregar un event listener para detectar cambios en el calendario
+calendario.addEventListener('change', () => {
+    // Obtener la fecha seleccionada en el calendario (en formato local)
+    const fechaSeleccionadaLocal = new Date(calendario.value);
+
+    // Convertir la fecha seleccionada a formato UTC para evitar diferencias de zona horaria
+    const fechaSeleccionadaUTC = new Date(Date.UTC(
+        fechaSeleccionadaLocal.getUTCFullYear(),
+        fechaSeleccionadaLocal.getUTCMonth(),
+        fechaSeleccionadaLocal.getUTCDate()
+    ));
+
+    // Verificar si la fecha seleccionada está dentro del rango permitido
+    if (fechaSeleccionadaUTC >= fechaLimite && fechaSeleccionadaUTC <= fechaActual) {
         // Extraer el día de la fecha seleccionada
         const diaSeleccionado = fechaSeleccionadaUTC.getUTCDate();
 
         // Actualizar el valor del campo de texto para mostrar solo el día
         document.getElementById('dia_seleccionado').value = diaSeleccionado;
-    });
-</script>
+    } else {
+        // Mostrar un mensaje de error si la fecha seleccionada está fuera del rango permitido
+        alert('Selecciona una fecha dentro de los 3 días hábiles.');
+        // Restablecer el valor del calendario a la fecha actual
+        calendario.valueAsDate = fechaActual;
+    }
+});
+    </script>
 </body>
 </html>
