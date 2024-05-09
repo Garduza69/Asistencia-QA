@@ -25,6 +25,7 @@ if (isset($_GET['code'])) {
 
     // Guarda el correo electrónico y el nombre en variables de sesión
     session_start();
+    $_SESSION["loggedin"] = true;
     $_SESSION['email'] = $email;
     $_SESSION['nombre'] = $nombre;
 
