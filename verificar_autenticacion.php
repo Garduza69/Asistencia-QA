@@ -9,4 +9,3 @@ if (isset($_SESSION['email']) && $_SESSION['email'] == "isc20.gerson.sahagun@us.
     // El usuario no está autenticado o no está autorizado
     echo json_encode(['autenticado' => false]);
 }
-?>

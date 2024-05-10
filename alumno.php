@@ -4,6 +4,11 @@ session_start();
 // Incluye el archivo de conexión a la base de datos
 include 'conexion.php';
 
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: index.php");
+    exit;
+}
 // Verifica si hay un correo electrónico enviado desde verificar_usuario.php
 if (isset($_SESSION['email'])) {
     $email = $_SESSION['email'];
