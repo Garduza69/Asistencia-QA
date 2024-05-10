@@ -1,12 +1,11 @@
 <?php
 // Verificar si se recibieron los datos del formulario
-if (isset($_POST['matricula']) && isset($_POST['dia_seleccionado']) && isset($_POST['mes']) && isset($_POST['motivo_seleccionado']) && isset($_POST['turno']) && isset($_POST['dia'])) {
+if (isset($_POST['matricula']) && isset($_POST['dia_seleccionado']) && isset($_POST['mes']) && isset($_POST['motivo_seleccionado']) && isset($_POST['dia'])) {
     // Si los datos están presentes, asignarlos a variables
     $matricula_seleccionada = $_POST['matricula'];
     $dia_seleccionado = $_POST['dia_seleccionado'];
     $mes_seleccionado = $_POST['mes'];
 	$motivo_seleccionado = $_POST['motivo_seleccionado'];
-	$turno_seleccionado = $_POST['turno'];
 	$fecha_seleccionada = $_POST['dia'];
     // Imprimir los datos para depuración
     echo "Matrícula: $matricula_seleccionada<br>";
@@ -16,7 +15,7 @@ if (isset($_POST['matricula']) && isset($_POST['dia_seleccionado']) && isset($_P
 	echo "Fecha seleccionado: $fecha_seleccionada<br>";
 	
     // Redirigir a otro archivo con los datos como parámetros GET
-    header("Location: reporteJustificante.php?matricula=$matricula_seleccionada&dia_seleccionado=$dia_seleccionado&mes=$mes_seleccionado&motivo_seleccionado=$motivo_seleccionado&turno=$turno_seleccionado&dia=$fecha_seleccionada");
+    header("Location: reporteJustificante.php?matricula=$matricula_seleccionada&dia_seleccionado=$dia_seleccionado&mes=$mes_seleccionado&motivo_seleccionado=$motivo_seleccionado&dia=$fecha_seleccionada");
     exit; // Asegúrate de salir del script después de la redirección
 
 } else {

@@ -35,7 +35,6 @@ $matricula = $_GET['matricula'];
 $dia_seleccionado = $_GET['dia_seleccionado'];
 $mes = $_GET['mes'];
 $motivo = $_GET['motivo_seleccionado'];
-$turno = $_GET['turno'];
 $fecha = $_GET['dia'];
 
 $consultaJustificacion = $db->query("UPDATE asistencia AS asis
@@ -48,43 +47,48 @@ WHERE MONTH(asis.fecha_alta) = '".$mes."'
 $pdf->SetTitle('Justificante', true);
 
 $consultaEncabezado = $db->query("SELECT 
-        al.matricula,
-        al.nombre as Nombre, ' ', al.primer_apellido as Apellido_Paterno, ' ', al.segundo_apellido as Apellido_Materno,
-        f.nombre AS Facultad,
-        gr.clave_grupo AS Grupo,
-        asis.fecha_alta,
-        asis.asistencia,
-        MAX(CASE 
-                WHEN MONTH(asis.fecha_alta) = 1 THEN 'Enero'
-                WHEN MONTH(asis.fecha_alta) = 2 THEN 'Febrero'
-                WHEN MONTH(asis.fecha_alta) = 3 THEN 'Marzo'
-                WHEN MONTH(asis.fecha_alta) = 4 THEN 'Abril'
-                WHEN MONTH(asis.fecha_alta) = 5 THEN 'Mayo'
-                WHEN MONTH(asis.fecha_alta) = 6 THEN 'Junio'
-                WHEN MONTH(asis.fecha_alta) = 7 THEN 'Julio'
-                WHEN MONTH(asis.fecha_alta) = 8 THEN 'Agosto'
-                WHEN MONTH(asis.fecha_alta) = 9 THEN 'Septiembre'
-                WHEN MONTH(asis.fecha_alta) = 10 THEN 'Octubre'
-                WHEN MONTH(asis.fecha_alta) = 11 THEN 'Noviembre'
-                WHEN MONTH(asis.fecha_alta) = 12 THEN 'Diciembre'
-            END) AS Mes,
-            s.nombre AS Semestre
-    FROM 
-        matricula mat
-    JOIN 
-        alumnos al ON mat.alumno_id = al.alumno_id
-    JOIN 
-        grupos gr ON mat.grupo_id = gr.grupo_id
-    JOIN 
-        facultades f ON gr.facultad_id = f.facultad_id
-    JOIN 
-        asistencia asis ON asis.asistencia 
-    JOIN 
-        semestres s ON gr.semestre_id = s.semestre_id
-    WHERE 
-        MONTH(asis.fecha_alta) = '".$mes."'
-        AND DAY(asis.fecha_alta) = '".$dia_seleccionado."'
-        AND al.matricula =  '".$matricula."';");
+    al.matricula,
+    al.nombre AS Nombre, 
+    ' ', 
+    al.primer_apellido AS Apellido_Paterno, 
+    ' ', 
+    al.segundo_apellido AS Apellido_Materno,
+    f.nombre AS Facultad,
+    gr.clave_grupo AS Grupo,
+    s.Turno AS Turno,
+    asis.fecha_alta,
+    asis.asistencia,
+    MAX(CASE 
+            WHEN MONTH(asis.fecha_alta) = 1 THEN 'Enero'
+            WHEN MONTH(asis.fecha_alta) = 2 THEN 'Febrero'
+            WHEN MONTH(asis.fecha_alta) = 3 THEN 'Marzo'
+            WHEN MONTH(asis.fecha_alta) = 4 THEN 'Abril'
+            WHEN MONTH(asis.fecha_alta) = 5 THEN 'Mayo'
+            WHEN MONTH(asis.fecha_alta) = 6 THEN 'Junio'
+            WHEN MONTH(asis.fecha_alta) = 7 THEN 'Julio'
+            WHEN MONTH(asis.fecha_alta) = 8 THEN 'Agosto'
+            WHEN MONTH(asis.fecha_alta) = 9 THEN 'Septiembre'
+            WHEN MONTH(asis.fecha_alta) = 10 THEN 'Octubre'
+            WHEN MONTH(asis.fecha_alta) = 11 THEN 'Noviembre'
+            WHEN MONTH(asis.fecha_alta) = 12 THEN 'Diciembre'
+        END) AS Mes,
+        s.nombre AS Semestre
+FROM 
+    matricula mat
+JOIN 
+    alumnos al ON mat.alumno_id = al.alumno_id
+JOIN 
+    grupos gr ON mat.grupo_id = gr.grupo_id
+JOIN 
+    facultades f ON gr.facultad_id = f.facultad_id
+JOIN 
+    asistencia asis ON asis.asistencia 
+JOIN 
+    semestres s ON gr.semestre_id = s.semestre_id
+WHERE 
+    MONTH(asis.fecha_alta) = '".$mes."'
+    AND DAY(asis.fecha_alta) = '".$dia_seleccionado."'
+    AND al.matricula =  '".$matricula."';");
 
 
 if($consultaEncabezado->num_rows > 0) {
@@ -150,7 +154,7 @@ if($consultaEncabezado->num_rows > 0) {
 
         $pdf->Cell(70, 12, utf8_decode($fila['Facultad']), 1, 0, 'C');
         $pdf->Cell(120, 12, utf8_decode($fila['Semestre']), 1, 0, 'C');
-        $pdf->Cell(70, 12, utf8_decode($turno), 1, 1, 'C');
+        $pdf->Cell(70, 12, utf8_decode($fila['Turno']), 1, 1, 'C');
 
         $pdf->Ln(5);
 
