@@ -274,7 +274,7 @@ if($consultaEncabezado->num_rows > 0){
         $primer_dia_semana = date('N', strtotime(date('Y-m-01', mktime(0, 0, 0, $mes, 1, 2024))));
 
         // Crear una matriz de nombres de día de semana ajustada al inicio del mes
-        $nombres_dias_semana = array('L', 'M', 'X', 'J', 'V', 'S', 'D');
+        $nombres_dias_semana = array('L', 'M', 'M', 'J', 'V', 'S', 'D');
         // Desplazar la matriz para que comience con el primer día del mes
         for ($i = 1; $i < $primer_dia_semana; $i++) {
             array_push($nombres_dias_semana, array_shift($nombres_dias_semana));
