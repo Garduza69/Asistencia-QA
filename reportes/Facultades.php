@@ -1,6 +1,13 @@
 <?php
+session_start();
 // Incluir el archivo de conexión a la base de datos
 require('conexion2.php');
+
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: index.php");
+    exit;
+}
 
 // Query para obtener las materias desde la base de datos
 $gpo = "select clave_grupo from grupos;";
