@@ -73,8 +73,7 @@ h1, h2, h3, h4, h5, h6 {
   top: 0;
   right: 0;
   transition: all 0.5s;
-  width: 100%;
-  z-index: 9999; /* Asegura que la barra de navegación esté por encima de otros elementos */
+  z-index: 997;
 }
 
 #header #logo {
