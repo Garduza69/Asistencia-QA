@@ -76,14 +76,6 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
       <nav id="nav-menu-container">
         <ul class="nav-menu">
           <li class="menu-active"><a href="auth.php">Iniciar sesión</a></li>
-          <li class="menu-has-children"><a href="">Contacto</a>
-            <ul>
-              <li class="menu-has-children"><a href="#">¿Quienes somos?</a>
-                <ul>
-              </li>
-            </ul>
-          </li>
-          <li><a href="#contact">Contacto</a></li>
         </ul>
       </nav><!-- #nav-menu-container -->
     </div>
