@@ -1,45 +1,174 @@
 <?php
 session_start();
 
-// Incluye el archivo de conexión a la base de datos
-include 'conexion.php';
-
-// Check if the user is logged in, if not then redirect him to login page
-if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
-    header("location: index.php");
-    exit;
-}
-// Verifica si hay un correo electrónico enviado desde verificar_usuario.php
-if (isset($_SESSION['email'])) {
-    $email = $_SESSION['email'];
-
-    // Llama a la función para obtener el nombre asociado al correo electrónico
-    $nombre = obtener_nombre($email, $pdo);
-
-    // Muestra el mensaje de bienvenida personalizado
-    echo "<h1>Bienvenido, $nombre</h1>";
-} else {
-    echo "No se proporcionó un correo electrónico.";
+if (!isset($_SESSION['loggedin'])) {
+    header("Location: index.php");
+    exit();
 }
 
-// Función para obtener el nombre asociado al correo electrónico en la base de datos
-function obtener_nombre($email, $conn) {
-    // Query para obtener el nombre basado en el correo electrónico
-    $query = "SELECT nombre FROM usuario WHERE email = :email";
-
-    // Preparar la consulta
-    $stmt = $conn->prepare($query);
-
-    // Bind de parámetros
-    $stmt->bindParam(':email', $email);
-
-    // Ejecutar la consulta
-    $stmt->execute();
-
-    // Obtener el resultado
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Devolver el nombre si se encontró, de lo contrario, devuelve un mensaje predeterminado
-    return $row ? $row['nombre'] : "Estudiante";
-}
+// Evitar almacenamiento en caché
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 ?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sotavento - Alumno</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="" name="keywords">
+  <meta content="" name="description">
+
+  <!-- Favicons -->
+  <link href="img/logoUS.png" rel="icon">
+  <link href="img/logoUS.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,700|Open+Sans:300,300i,400,400i,700,700i" rel="stylesheet">
+
+  <!-- Bootstrap CSS File -->
+  <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Libraries CSS Files -->
+  <link href="lib/animate/animate.min.css" rel="stylesheet">
+  <link href="lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <link href="lib/ionicons/css/ionicons.min.css" rel="stylesheet">
+  <link href="lib/magnific-popup/magnific-popup.css" rel="stylesheet">
+
+  <!-- Main Stylesheet File -->
+  <link href="css/style2.css" rel="stylesheet">
+
+  <!-- Custom Stylesheet for Logo -->
+  <style>
+#logo h1 a {
+  display: inline-block;
+  width: 150px; /* Nueva anchura */
+  height: 70px; /* Nueva altura */
+  background-image: url('img/sotavento.png');
+  background-size: contain; /* O ajusta según tu preferencia */
+  background-repeat: no-repeat;
+  text-indent: -9999px;
+}
+  </style>
+
+  <!-- =======================================================
+    Theme Name: Avilon
+    Theme URL: https://bootstrapmade.com/avilon-bootstrap-landing-page-template/
+    Author: BootstrapMade.com
+    License: https://bootstrapmade.com/license/
+  ======================================================= -->
+  <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('check_session.php', { cache: 'no-store' })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.authenticated) {
+                        // Redirigir a la página de inicio de sesión si no está autenticado
+                        window.location.href = 'index.php';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        // Evitar que el navegador almacene en caché
+        if (window.history && window.history.pushState) {
+            window.history.pushState(null, null, window.location.href);
+            window.onpopstate = function() {
+                window.history.pushState(null, null, window.location.href);
+            };
+        }
+    </script>
+</head>
+
+<body>
+
+  <!--==========================
+    Header
+  ============================-->
+  <header id="header">
+    <div class="container">
+        <div id="logo" class="pull-left">
+          <h1><a href="#intro" class="scrollto">Universidad de Sotavento</a></h1>
+        </div>
+      <nav id="nav-menu-container">
+        <ul class="nav-menu">
+          <li class="menu-active"><a href="cerrar_sesion.php">Cerrar sesión</a></li>
+          <li class="menu-has-children"><a href="">acciones</a>
+            <ul>
+                <li class="menu-active"><a href="#" onclick="consultaAsistencia()">Consulta de Asistencia</a></li>
+                <li class="menu-active"><a href="horario_sistemas.pdf" download>Descargar Horario</a></li>
+                <li class="menu-active"><a href="generarqr.html">Generar QR</a></li>
+            </ul>
+        </ul>
+      </nav><!-- #nav-menu-container -->
+    </div>
+  </header><!-- #header -->
+
+  <!--==========================
+    Intro Section
+  ============================-->
+  <section id="intro">
+    
+    <div class="intro-text">
+        <h2 id="welcome-message"><a class="scrollto"></a></h2>
+      <p>Menú</p>
+      <a href="#" onclick="consultaAsistencia()" class="btn-get-started scrollto">Consulta de Asistencia</a>
+        <a href="horario_sistemas.pdf" download class="btn-get-started scrollto">Descargar Horario</a>
+        <a href="generarqr.html" class="btn-get-started scrollto">Generar QR</a>
+    </div>
+
+
+
+  </section><!-- #intro -->
+
+
+
+  <!--==========================
+    Footer
+  ============================-->
+
+
+  <!-- JavaScript Libraries -->
+  <script src="lib/jquery/jquery.min.js"></script>
+  <script src="lib/jquery/jquery-migrate.min.js"></script>
+  <script src="lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="lib/easing/easing.min.js"></script>
+  <script src="lib/wow/wow.min.js"></script>
+  <script src="lib/superfish/hoverIntent.js"></script>
+  <script src="lib/superfish/superfish.min.js"></script>
+  <script src="lib/magnific-popup/magnific-popup.min.js"></script>
+
+  <!-- Contact Form JavaScript File -->
+  <script src="contactform/contactform.js"></script>
+
+  <!-- Template Main Javascript File -->
+  <script src="js/main.js"></script>
+  <script>
+    window.onload = function() {
+        // Hacer una solicitud AJAX a alumno.php para obtener el mensaje de bienvenida
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("welcome-message").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "ob_nombre.php", true);
+        xhttp.send();
+    };
+
+    function consultaAsistencia() {
+        // Aquí puedes agregar la lógica para la consulta de asistencia
+        alert("Funcionalidad de consulta de asistencia en desarrollo.");
+    }
+
+    function generarQR() {
+        // Aquí puedes agregar la lógica para generar el QR
+        alert("Funcionalidad de generación de QR en desarrollo.");
+    }
+</script>
+
+</body>
+</html>

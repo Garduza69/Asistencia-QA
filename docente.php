@@ -1,8 +1,22 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['loggedin'])) {
+    header("Location: index.php");
+    exit();
+}
+
+// Evitar almacenamiento en caché
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Sotavento - Alumno</title>
+  <title>Sotavento - Docente</title>
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <meta content="" name="keywords">
   <meta content="" name="description">
@@ -45,6 +59,29 @@
     Author: BootstrapMade.com
     License: https://bootstrapmade.com/license/
   ======================================================= -->
+
+  <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('check_session.php', { cache: 'no-store' })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.authenticated) {
+                        // Redirigir a la página de inicio de sesión si no está autenticado
+                        window.location.href = 'index.php';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        // Evitar que el navegador almacene en caché
+        if (window.history && window.history.pushState) {
+            window.history.pushState(null, null, window.location.href);
+            window.onpopstate = function() {
+                window.history.pushState(null, null, window.location.href);
+            };
+        }
+    </script>
+    
 </head>
 
 <body>
@@ -62,9 +99,9 @@
           <li class="menu-active"><a href="cerrar_sesion.php">Cerrar sesión</a></li>
           <li class="menu-has-children"><a href="">acciones</a>
             <ul>
-                <li class="menu-active"><a href="#" onclick="consultaAsistencia()">Consulta de Asistencia</a></li>
-                <li class="menu-active"><a href="horario_sistemas.pdf" download>Descargar Horario</a></li>
-                <li class="menu-active"><a href="generarqr.html">Generar QR</a></li>
+                <li class="menu-active"><a href="#" onclick="registrarAsistencia()">Registrar Asistencia</a></li>
+                <li class="menu-active"><a href="#" onclick="generarReporte()">Generar Reporte</a></li>
+                <li class="menu-active"><a href="#" onclick="notificaciones()">Notificaciones</a></li>
             </ul>
         </ul>
       </nav><!-- #nav-menu-container -->
@@ -75,13 +112,14 @@
     Intro Section
   ============================-->
   <section id="intro">
-    
+    <br>
+    <br>
     <div class="intro-text">
         <h2 id="welcome-message"><a class="scrollto"></a></h2>
       <p>Menú</p>
-      <a href="#" onclick="consultaAsistencia()" class="btn-get-started scrollto">Consulta de Asistencia</a>
-        <a href="horario_sistemas.pdf" download class="btn-get-started scrollto">Descargar Horario</a>
-        <a href="generarqr.html" class="btn-get-started scrollto">Generar QR</a>
+      <a href="#" onclick="registrarAsistencia()" class="btn-get-started scrollto">Registrar Asistencia</a>
+      <a href="#" onclick="generarReporte()" class="btn-get-started scrollto">Generar Reporte</a>
+      <a href="#" onclick="notificaciones()" class="btn-get-started scrollto">Notificaciones</a>
     </div>
 
 
@@ -112,25 +150,31 @@
   <script src="js/main.js"></script>
   <script>
     window.onload = function() {
-        // Hacer una solicitud AJAX a alumno.php para obtener el mensaje de bienvenida
+        // Hacer una solicitud AJAX a docente.php para obtener el mensaje de bienvenida
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 document.getElementById("welcome-message").innerHTML = this.responseText;
             }
         };
-        xhttp.open("GET", "alumno.php", true);
+        xhttp.open("GET", "ob_nombre.php", true);
         xhttp.send();
     };
 
-    function consultaAsistencia() {
-        // Aquí puedes agregar la lógica para la consulta de asistencia
-        alert("Funcionalidad de consulta de asistencia en desarrollo.");
+    function registrarAsistencia() {
+        // Redireccionar al docente a lector.html
+        window.location.href = "lector.html";
     }
 
-    function generarQR() {
-        // Aquí puedes agregar la lógica para generar el QR
-        alert("Funcionalidad de generación de QR en desarrollo.");
+   function generarReporte() {
+// Aquí puedes agregar la lógica para generar el reporte
+window.location.href = "reportes/Materias.php";
+}
+
+
+    function notificaciones() {
+        // Aquí puedes agregar la lógica para generar el reporte
+        alert("Funcionalidad de notificaciones en desarrollo.");
     }
 </script>
 
