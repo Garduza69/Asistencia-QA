@@ -17,16 +17,22 @@ if (ini_get("session.use_cookies")) {
         $params["secure"], $params["httponly"]
     );
 }
+
+
+
+// Eliminar las variables de sesión específicas de las credenciales de Google
+$_SESSION["loggedin"] = false;
+
+unset($_SESSION['loggedin']);
+unset($_SESSION['email']);
+unset($_SESSION['nombre']);
+
+session_unset();
+
 session_destroy();
 
-// Eliminar caché del navegador
-header("Expires: Tue, 01 Jan 2000 00:00:00 GMT");
-header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
-
-// Redirigir al usuario a la página principal de tu aplicación
-header('Location: http://asistenciasus.site');
+// Redirigir al usuario a la página de logout de Google y luego de regreso al índice de tu página web
+$googleLogoutUrl = 'https://accounts.google.com/Logout?continue=https://appengine.google.com/_ah/logout?continue=http://asistenciasus.site';
+header('Location: ' . filter_var($googleLogoutUrl, FILTER_SANITIZE_URL));
 exit;
 ?>

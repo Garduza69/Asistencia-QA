@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 
 $response = array('authenticated' => false);
 
-if (isset($_SESSION['user_id'])) {
+if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
     $response['authenticated'] = true;
 }
 
