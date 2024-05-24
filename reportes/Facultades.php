@@ -6,7 +6,7 @@ require('conexion2.php');
 isset($_SESSION['tipo_usuario']);
 $tipo_usuario = $_SESSION['tipo_usuario'];
 
-if (!isset($_SESSION['loggedin']) || $tipo_usuario != 4 || $tipo_usuario != 3 ) {
+if (!isset($_SESSION['loggedin']) || ($tipo_usuario != 4 && $tipo_usuario != 3) ) {
     header("Location: ../index.php");
     exit();
 }
