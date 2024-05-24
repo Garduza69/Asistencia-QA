@@ -3,10 +3,12 @@ session_start();
 // Incluir el archivo de conexión a la base de datos
 require('conexion2.php');
 
-// Check if the user is logged in, if not then redirect him to login page
-if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
-    header("location: index.php");
-    exit;
+isset($_SESSION['tipo_usuario']);
+$tipo_usuario = $_SESSION['tipo_usuario'];
+
+if (!isset($_SESSION['loggedin']) || $tipo_usuario != 4 ) {
+    header("Location: ../index.php");
+    exit();
 }
 ?>
 

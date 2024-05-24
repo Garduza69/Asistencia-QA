@@ -6,15 +6,15 @@ require('conexion2.php');
 isset($_SESSION['tipo_usuario']);
 $tipo_usuario = $_SESSION['tipo_usuario'];
 
-if (!isset($_SESSION['loggedin']) || $tipo_usuario != 4 || $tipo_usuario != 3 ) {
+if (!isset($_SESSION['loggedin']) || $tipo_usuario != 3 ) {
     header("Location: ../index.php");
     exit();
 }
 
 // Query para obtener las materias desde la base de datos
-$gpo = "select clave_grupo from grupos;";
+$mat = "select nombre from materias;";
 $fac = "select nombre from facultades;";
-$grupos = $db->query($gpo);
+$materias = $db->query($mat);
 $facultad = $db->query($fac);
 ?>
 
@@ -76,7 +76,7 @@ $facultad = $db->query($fac);
 <body>
     <div class="container">
         <h1>Formulario de Selección</h1>
-        <form action="procesar_facultad.php" method="post">
+        <form action="procesar_datos.php" method="post">
             <label for="facultad">Facultad:</label>
             <select name="facultad" id="facultad">
                 <?php
@@ -87,7 +87,7 @@ $facultad = $db->query($fac);
                         echo '<option value="' . $row["nombre"] . '">' . $row["nombre"] . '</option>';
                     }
                 } else {
-                    echo '<option value="">No hay Facultades disponibles</option>';
+                    echo '<option value="">No hay materias disponibles</option>';
                 }
 
                 // Cerrar la consulta
@@ -95,21 +95,21 @@ $facultad = $db->query($fac);
                 ?>
             </select>
 
-            <label for="grupo">Grupo:</label>
-            <select name="grupo" id="grupo">
+            <label for="materia">Materia:</label>
+            <select name="materia" id="materia">
                 <?php
                 // Verificar si se obtuvieron resultados de la consulta
-                if ($grupos->num_rows > 0) {
+                if ($materias->num_rows > 0) {
                     // Iterar sobre los resultados y generar las opciones del combo box
-                    while ($row = $grupos->fetch_assoc()) {
-                        echo '<option value="' . $row["clave_grupo"] . '">' . $row["clave_grupo"] . '</option>';
+                    while ($row = $materias->fetch_assoc()) {
+                        echo '<option value="' . $row["nombre"] . '">' . $row["nombre"] . '</option>';
                     }
                 } else {
-                    echo '<option value="">No hay grupos disponibles</option>';
+                    echo '<option value="">No hay materias disponibles</option>';
                 }
 
                 // Cerrar la consulta
-                $grupos->close();
+                $materias->close();
                 ?>
             </select>
 

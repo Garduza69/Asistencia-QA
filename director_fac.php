@@ -1,11 +1,13 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['loggedin'])) {
+isset($_SESSION['tipo_usuario']);
+$tipo_usuario = $_SESSION['tipo_usuario'];
+
+if (!isset($_SESSION['loggedin']) || $tipo_usuario != 4 ) {
     header("Location: index.php");
     exit();
 }
-
 // Evitar almacenamiento en caché
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
