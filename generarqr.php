@@ -1,3 +1,17 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['loggedin'])) {
+    header("Location: index.php");
+    exit();
+}
+
+// Evitar almacenamiento en caché
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,6 +59,29 @@
     Author: BootstrapMade.com
     License: https://bootstrapmade.com/license/
   ======================================================= -->
+
+  <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('check_session.php', { cache: 'no-store' })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.authenticated) {
+                        // Redirigir a la página de inicio de sesión si no está autenticado
+                        window.location.href = 'index.php';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        // Evitar que el navegador almacene en caché
+        if (window.history && window.history.pushState) {
+            window.history.pushState(null, null, window.location.href);
+            window.onpopstate = function() {
+                window.history.pushState(null, null, window.location.href);
+            };
+        }
+    </script>
+    
 </head>
 
 <body>
@@ -65,14 +102,6 @@
                 <li class="menu-active"><a href="#" onclick="consultaAsistencia()">Consulta de Asistencia</a></li>
                 <li class="menu-active"><a href="horario_sistemas.pdf" download>Descargar Horario</a></li>
             </ul>
-          <li class="menu-has-children"><a href="">Contacto</a>
-            <ul>
-              <li class="menu-has-children"><a href="#">¿Quienes somos?</a>
-                <ul>
-              </li>
-            </ul>
-          </li>
-          <li><a href="#contact">Contacto</a></li>
         </ul>
       </nav><!-- #nav-menu-container -->
     </div>

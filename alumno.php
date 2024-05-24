@@ -100,7 +100,7 @@ header("Pragma: no-cache");
             <ul>
                 <li class="menu-active"><a href="#" onclick="consultaAsistencia()">Consulta de Asistencia</a></li>
                 <li class="menu-active"><a href="horario_sistemas.pdf" download>Descargar Horario</a></li>
-                <li class="menu-active"><a href="generarqr.html">Generar QR</a></li>
+                <li class="menu-active"><a href="generarqr.php">Generar QR</a></li>
             </ul>
         </ul>
       </nav><!-- #nav-menu-container -->
@@ -117,7 +117,7 @@ header("Pragma: no-cache");
       <p>Menú</p>
       <a href="#" onclick="consultaAsistencia()" class="btn-get-started scrollto">Consulta de Asistencia</a>
         <a href="horario_sistemas.pdf" download class="btn-get-started scrollto">Descargar Horario</a>
-        <a href="generarqr.html" class="btn-get-started scrollto">Generar QR</a>
+        <a href="generarqr.php" class="btn-get-started scrollto">Generar QR</a>
     </div>
 
 

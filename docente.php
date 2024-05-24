@@ -163,7 +163,7 @@ header("Pragma: no-cache");
 
     function registrarAsistencia() {
         // Redireccionar al docente a lector.html
-        window.location.href = "lector.html";
+        window.location.href = "lector.php";
     }
 
    function generarReporte() {
