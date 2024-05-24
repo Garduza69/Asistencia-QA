@@ -89,7 +89,7 @@ header("Pragma: no-cache");
     <h1 id="welcome-message"></h1>
     <h2>Menú</h2>
     <ul>
-        <a class="btn" href="reportes/peefilAdmin.html">Generar Reporte</a>
+        <a class="btn" href="reportes/perfilAdmin.html">Generar Reporte</a>
         <br>
         <br>
         <button class="btn" onclick="consulta()">Consulta</button>
