@@ -81,24 +81,10 @@ header("Pragma: no-cache");
             };
         }
     </script>
-    
+
 </head>
 
 <body>
-
-    <h1 id="welcome-message"></h1>
-    <h2>Menú</h2>
-    <ul>
-        <a class="btn" href="reportes/perfilAdmin.html">Generar Reporte</a>
-        <br>
-        <br>
-        <button class="btn" onclick="consulta()">Consulta</button>
-        <br>
-        <br>
-        <button class="btn" onclick="notificaciones()">Notificaciones</button>
-        <br>
-    </ul>
-
 
   <!--==========================
     Header
@@ -123,7 +109,6 @@ header("Pragma: no-cache");
               </li>
             </ul>
           </li>
-          <li><a href="#contact">Contacto</a></li>
         </ul>
       </nav><!-- #nav-menu-container -->
     </div>
@@ -220,7 +205,7 @@ header("Pragma: no-cache");
                     xhttpMensaje.send();
                 } else {
                     // Si el usuario no está autenticado, redirigirlo a la página de inicio de sesión u otra página apropiada
-                    window.location.href = "pagina_de_inicio.php";
+                    window.location.href = "index.php";
                 }
             }
         };
