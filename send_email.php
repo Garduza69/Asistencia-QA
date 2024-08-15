@@ -75,9 +75,18 @@ if (isset($_GET['token'])) {
                 $mail->Subject = 'Error al registrar la asistencia';
                 $mail->Body = 'Hubo un error al intentar registrar tu asistencia.';
             }
+            elseif ($resultado === "calificacion1") {
+                $mail->Subject = 'Calificación disponible';
+                $mail->Body = 'Ya puedes consultar tus calificaciones en la página web de la institución.';
+            }
+            elseif ($resultado === "calificacion2") {
+                $mail->Subject = 'Calificación recibida';
+                $mail->Body = 'Las calificaciones del parcial fueron entregadas de manera exitosa.';
+            }
 
             // Envía el correo
             $mail->send();
+            //Envía un mensaje cuando el lector haya escaneado el código QR
             if ($resultado === "success") {
                 echo 'Registro de asistencia exitoso.';
             } 

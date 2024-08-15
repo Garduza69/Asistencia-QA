@@ -123,7 +123,7 @@ header("Pragma: no-cache");
     
     <div id="qr_code"></div>
     <hr/>
-    <p>El profesor debe escanearlo para registrar tu asistencia.</p>
+    <p>Utiliza este código QR para la asistencia y la consulta de calificación</p>
     </div>
 
   </section><!-- #intro -->
