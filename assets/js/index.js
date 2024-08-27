@@ -87,7 +87,7 @@ function registrarAsistencia(token) {
     })
     .then(data => {
       // Mostrar mensaje de éxito o de error utilizando SweetAlert2
-      if (data.trim() === 'Registro de asistencia exitoso.') {
+      if (data.trim() === "Se ha registrado exitosamente la asistencia.") {
         Swal.fire({
           title: 'Éxito',
           text: data.trim(),
@@ -148,8 +148,8 @@ function ejecutarFaltasPHP() {
       if (!response.ok) {
         throw new Error('Error al ejecutar faltas.php');
       }
-      // Redirigir a la página docente.html una vez que se complete la ejecución de faltas.php
-      window.location.href = 'docente.html';
+      // Redirigir a la página docente.php una vez que se complete la ejecución de faltas.php
+      window.location.href = 'docente.php';
     })
     .catch(error => {
       console.error('Error al ejecutar faltas.php:', error);
