@@ -27,22 +27,6 @@ $stmt_alumno->execute();
 $row_alumno = $stmt_alumno->fetch(PDO::FETCH_ASSOC);
 $alumno_id = $row_alumno['alumno_id'];
 
-$sql_materias = "SELECT a.materia_id AS materia_id, m.nombre AS nombre
-                    FROM matricula a 
-                    join grupos g on a.grupo_id = g.grupo_id and g.vigenciaSem = 1
-                    join materias m on a.materia_id = m.materia_id
-                WHERE a.alumno_id = :alumno_id
-                group by a.materia_id, m.nombre;";
-$stmt_materias = $pdo->prepare($sql_materias);
-$stmt_materias->bindParam(':alumno_id', $alumno_id, PDO::PARAM_INT);
-$stmt_materias->execute();
-
-    while ($row = $stmt_materias->fetch(PDO::FETCH_ASSOC)) {
-        $options .= '<option value="' . $row['materia_id'] . '">' . $row['nombre'] . '</option>';
-    }
-
-
-/*
 // Consultar los grupo_id asociados al alumno_id en la tabla matricula
 $sql_grupos = "SELECT grupo_id FROM matricula WHERE alumno_id = :alumno_id";
 $stmt_grupos = $pdo->prepare($sql_grupos);
@@ -77,7 +61,7 @@ while ($row_grupovig = $stmt_grupovig->fetch(PDO::FETCH_ASSOC)) {
     while ($row = $stmt_materias->fetch(PDO::FETCH_ASSOC)) {
         $options .= '<option value="' . $row['materia_id'] . '">' . $row['nombre'] . '</option>';
     }
-}*/
+}
 
 echo $options;
 

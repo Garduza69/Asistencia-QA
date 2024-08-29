@@ -1,6 +1,6 @@
 <?php
 // Incluir el archivo de conexión a la base de datos
-require('conexion2.php');
+require('conexion_2.php');
 
 // Query para obtener las materias desde la base de datos
 $gpo = "select clave_grupo from grupos;";

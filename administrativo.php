@@ -6,6 +6,7 @@ if (!isset($_SESSION['loggedin'])) {
     exit();
 }
 
+
 // Evitar almacenamiento en caché
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
@@ -99,7 +100,6 @@ header("Pragma: no-cache");
       <nav id="nav-menu-container">
         <ul class="nav-menu">
           <li class="menu-active"><a href="#intro">Inicio</a></li>
-          <li class="menu-active"><a href="cerrar_sesion.php">Cerrar sesión</a></li>
           <li class="menu-has-children"><a href="">Asistencia</a>
             <ul>
               <li class="menu-has-children"><a>Consultar Listas</a>
