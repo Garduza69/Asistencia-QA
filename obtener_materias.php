@@ -11,7 +11,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
 $email_usuario = $_SESSION['email'];
 
-// Consultar el idUsuario asociado al correo del usuario actual
+// Consultar el idUsuario asociado al correo del usuario actual 1
 $sql_usuario = "SELECT idUsuario FROM usuario WHERE Email = :email";
 $stmt_usuario = $pdo->prepare($sql_usuario);
 $stmt_usuario->bindParam(':email', $email_usuario, PDO::PARAM_STR);
