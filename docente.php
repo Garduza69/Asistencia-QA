@@ -104,6 +104,7 @@ header("Pragma: no-cache");
             <ul>
                 <li class="menu-active"><a href="#" onclick="registrarAsistencia()">Registrar Asistencia</a></li>
                 <li class="menu-active"><a href="#" onclick="generarReporte()">Generar Reporte</a></li>
+                <li class="menu-active"><a href="#" onclick="registrarCalificacion()">Registrar Calificaciones</a></li>
                 <li class="menu-active"><a href="#" onclick="notificaciones()">Notificaciones</a></li>
             </ul>
         </ul>
@@ -121,6 +122,7 @@ header("Pragma: no-cache");
         <h2 id="welcome-message"><a class="scrollto"></a></h2>
       <p>Menú</p>
       <a href="#" onclick="registrarAsistencia()" class="btn-get-started scrollto">Registrar Asistencia</a>
+      <a href="#" onclick="registrarCalificacion()" class="btn-get-started scrollto">Registrar Calificación</a>
       <a href="#" onclick="generarReporte()" class="btn-get-started scrollto">Generar Reporte</a>
       <a href="#" onclick="notificaciones()" class="btn-get-started scrollto">Notificaciones</a>
     </div>
@@ -173,6 +175,11 @@ header("Pragma: no-cache");
 // Aquí puedes agregar la lógica para generar el reporte
 window.location.href = "reportes/Materias.php";
 }
+
+    function registrarCalificacion() {
+        // Redireccionar al docente a lector.html
+        window.location.href = "reportes/captura_cal.php";
+    }
 
 
     function notificaciones() {
