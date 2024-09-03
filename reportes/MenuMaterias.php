@@ -191,7 +191,6 @@ if($consultaEncabezado->num_rows > 0) {
         $x = 153;
         $y = 67.5;
 
-
         // Dibuja el texto en la posición especificada
         $pdf->Text($x, $y, utf8_decode('DIAS DE CLASES EN EL MES'));
 
