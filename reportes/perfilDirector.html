@@ -82,8 +82,7 @@
   <section id="intro">
 
     <div class="intro-text">
-      <h2>30 AÑOS DE EXCELENCIA ACADEMICA</h2>
-      <p>Celebrando con promociones y descuentos</p>
+      <h2 id="welcome-message"></h2>
       <a href="#about" class="btn-get-started scrollto">Acércate a la Universidad de Sotavento</a>
     </div>
 
@@ -149,6 +148,18 @@
 
 
   <!-- JavaScript Libraries -->
+  <script> window.onload = function() {
+            // Hacer una solicitud AJAX a director_fac.php para obtener el mensaje de bienvenida
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("welcome-message").innerHTML = this.responseText;
+                }
+            };
+            xhttp.open("GET", "../alumno.php", true);
+            xhttp.send();
+        };
+ </script>
   <script src="lib/jquery/jquery.min.js"></script>
   <script src="lib/jquery/jquery-migrate.min.js"></script>
   <script src="lib/bootstrap/js/bootstrap.bundle.min.js"></script>

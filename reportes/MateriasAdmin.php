@@ -3,6 +3,7 @@ session_start();
 // Incluir el archivo de conexión a la base de datos
 require('conexion2.php');
 
+
 isset($_SESSION['tipo_usuario']);
 $tipo_usuario = $_SESSION['tipo_usuario'];
 
@@ -10,6 +11,7 @@ if (!isset($_SESSION['loggedin']) || $tipo_usuario != 3 ) {
     header("Location: ../index.php");
     exit();
 }
+
 
 // Query para obtener las materias desde la base de datos
 $mat = "select nombre from materias;";
