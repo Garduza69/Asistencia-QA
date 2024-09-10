@@ -73,6 +73,9 @@ if (isset($_SESSION['email'])) {
                                 $row_alumno = $result_alumno->fetch_assoc();
                                 $alumno_id = $row_alumno['alumno_id'];
 
+                                // Establecer la zona horaria a la Ciudad de México
+                                date_default_timezone_set("America/Mexico_City");
+
                                 // Obtener la fecha actual
                                 $fecha_actual = date("Y-m-d");
 

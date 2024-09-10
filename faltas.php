@@ -41,6 +41,9 @@ if (isset($_SESSION['email'])) {
                 $materias_imparte[] = $row_materia['materia_id'];
             }
 
+            // Establecer la zona horaria a la Ciudad de México
+            date_default_timezone_set("America/Mexico_City");
+
             // Obtener la fecha actual
             $fecha_actual = date("Y-m-d");
 
