@@ -1,8 +1,8 @@
 <?php
 // Configuración de la base de datos
 $servername = "localhost"; // Cambia localhost por el servidor de tu base de datos
-$username = "u712195824_sistema2"; // Cambia tu_usuario por el nombre de usuario de tu base de datos
-$password = "Cruzazul443"; // Cambia tu_contraseña por la contraseña de tu base de datos
+$username = "root"; // Cambia tu_usuario por el nombre de usuario de tu base de datos
+$password = ""; // Cambia tu_contraseña por la contraseña de tu base de datos
 $dbname = "u712195824_sistema2"; // Cambia login por el nombre de tu base de datos
 // Inicia la sesión
 session_start();
@@ -19,6 +19,12 @@ if (isset($_SESSION['email'])) {
         die("Error de conexión: " . $conn->connect_error);
     }
 
+    // Establecer la zona horaria a la Ciudad de México
+    date_default_timezone_set("America/Mexico_City");
+
+    //obtener la hora actual
+    $hora_actual = date("H:i:s");
+
     // Consultar el idUsuario asociado al correo del usuario actual
     $sql_usuario = "SELECT idUsuario FROM usuario WHERE email = '$email_usuario'";
     $result_usuario = $conn->query($sql_usuario);
@@ -34,18 +40,17 @@ if (isset($_SESSION['email'])) {
             $profesor_id = $row_profesor['profesor_id'];
 
             // Consultar las materias que imparte el profesor en la tabla horarios
-            $sql_materias = "SELECT materia_id FROM horarios WHERE profesor_id = '$profesor_id'";
+            $sql_materias = "SELECT materia_id FROM horarios WHERE profesor_id = '$profesor_id' AND '$hora_actual' BETWEEN hora_inicio AND hora_fin";
             $result_materias = $conn->query($sql_materias);
             $materias_imparte = [];
             while ($row_materia = $result_materias->fetch_assoc()) {
                 $materias_imparte[] = $row_materia['materia_id'];
             }
 
-            // Establecer la zona horaria a la Ciudad de México
-            date_default_timezone_set("America/Mexico_City");
-
             // Obtener la fecha actual
             $fecha_actual = date("Y-m-d");
+
+
 
             // Iterar sobre las materias que imparte el profesor
             foreach ($materias_imparte as $materia_id) {
