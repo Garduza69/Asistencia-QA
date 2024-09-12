@@ -1,8 +1,8 @@
 <?php
 // Configuración de la base de datos
 $servername = "localhost"; // Cambia localhost por el servidor de tu base de datos
-$username = "u712195824_sistema2"; // Cambia tu_usuario por el nombre de usuario de tu base de datos
-$password = "Cruzazul443"; // Cambia tu_contraseña por la contraseña de tu base de datos
+$username = "root"; // Cambia tu_usuario por el nombre de usuario de tu base de datos
+$password = ""; // Cambia tu_contraseña por la contraseña de tu base de datos
 $dbname = "u712195824_sistema2"; // Cambia login por el nombre de tu base de datos
 
 // Inicia la sesión
@@ -47,16 +47,22 @@ if (isset($_SESSION['email'])) {
                 $token = $_GET['token'];
 
                 // Consultar la materia asociada al token en la tabla codigos_qr
-                $sql_select = "SELECT materia_id, id_usuario, used FROM codigos_qr WHERE token = '$token'";
+                $sql_select = "SELECT id_codigo, id_usuario, used FROM codigos_qr WHERE token = '$token'";
                 $result_select = $conn->query($sql_select);
 
                 // Verificar si se encontró el token en la base de datos
                 if ($result_select->num_rows > 0) {
-                    // Obtener el materia_id, el id_usuario y used asociados al token
+                    // Obtener el id_usuario y used asociados al token
                     $row_select = $result_select->fetch_assoc();
-                    $materia_id = $row_select['materia_id'];
+                    $id_codigo = $row_select['id_codigo'];
                     $id_usuario = $row_select['id_usuario'];
                     $used = $row_select['used'];
+
+                    $sql_selectmat = "SELECT materia_id FROM materia_qr WHERE id_codigo = '$id_codigo'";
+                    $result_selectmat = $conn->query($sql_selectmat);
+                    // Obtener el materia_id
+                    $row_selectmat = $result_selectmat->fetch_assoc();
+                    $materia_id = $row_selectmat['materia_id'];
 
                     //verificar si el código ya fue usado
                     if($used == 0){
