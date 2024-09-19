@@ -34,8 +34,9 @@ if ($stmt_usuario->num_rows > 0) {
         // Consultar las materias que imparte el profesor en la tabla horarios
         $options = '';
         $sql_materias = "SELECT m.nombre AS nombre FROM horarios h 
-                        JOIN materias m ON m.materia_id = h.materia_id
-                        WHERE h.profesor_id = ? GROUP BY nombre";
+                            JOIN materias m ON m.materia_id = h.materia_id
+	                        JOIN grupos g on h.grupo_id = g.grupo_id and g.vigenciaSem = 1
+                            WHERE h.profesor_id = ? GROUP BY nombre";
         $stmt_materias = $db->prepare($sql_materias);
         $stmt_materias->bind_param("i", $profesor_id);
         $stmt_materias->execute();
