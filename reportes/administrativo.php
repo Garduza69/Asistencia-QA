@@ -38,6 +38,13 @@
   text-indent: -9999px;
 }
   </style>
+
+  <!-- =======================================================
+    Theme Name: Avilon
+    Theme URL: https://bootstrapmade.com/avilon-bootstrap-landing-page-template/
+    Author: BootstrapMade.com
+    License: https://bootstrapmade.com/license/
+  ======================================================= -->
 </head>
 
 <body>
@@ -54,23 +61,18 @@
 
       <nav id="nav-menu-container">
         <ul class="nav-menu">
-		<li class="menu-has-children"><a href="">Inicio</a></li>
-          <li class="menu-has-children"><a href="">Justificantes</a>
-            <ul>
-                <li><a href="Materias.php">Consultar Asistencia</a></li>
-                <li><a href="Justificantes.php">Generar Justificante</a></li>
-            </ul>
-          </li>
+          <li class="menu-active"><a href="#intro">Inicio</a></li>
           <li class="menu-has-children"><a href="">Asistencia</a>
             <ul>
-              <li class="menu-has-children"><a>Generar Lista</a>
+              <li class="menu-has-children"><a>Consultar Listas</a>
                 <ul>
-                  <li><a href="Materias.php">Lista por Materia</a></li>
-                  <li><a href="Facultades.php">Lista por Facultad</a></li>
+                  <li><a href="Materias.php">Listas por Materia</a></li>
+                  <li><a href="Facultades.php">Listas por Facultad</a></li>
                 </ul>
               </li>
             </ul>
           </li>
+          <li><a href="#contact">Contacto</a></li>
         </ul>
       </nav><!-- #nav-menu-container -->
     </div>
@@ -82,23 +84,22 @@
   <section id="intro">
 
     <div class="intro-text">
-      <h2>30 AÑOS DE EXCELENCIA ACADEMICA</h2>
-      <p>Celebrando con promociones y descuentos</p>
+      <h2 id="welcome-message"></h2>
       <a href="#about" class="btn-get-started scrollto">Acércate a la Universidad de Sotavento</a>
     </div>
 
     <div class="product-screens">
 
       <div class="product-screen-1 wow fadeInUp" data-wow-delay="0.4s" data-wow-duration="0.6s">
-        <img src="img/noticia1.png" alt="">
+        <img src="reportes/img/noticia1.png" alt="">
       </div>
 
       <div class="product-screen-2 wow fadeInUp" data-wow-delay="0.2s" data-wow-duration="0.6s">
-        <img src="img/noticia2.png" alt="">
+        <img src="reportes/img/noticia2.png" alt="">
       </div>
 
       <div class="product-screen-3 wow fadeInUp" data-wow-duration="0.6s">
-        <img src="img/noticia3.png" alt="">
+        <img src="reportes/img/noticia3.png" alt="">
       </div>
 
     </div>
@@ -161,7 +162,20 @@
   <!-- Contact Form JavaScript File -->
   <script src="contactform/contactform.js"></script>
 
-  <!-- Template Main Javascript File -->
+  <!-- Custom JavaScript File -->
+  <script>
+    window.onload = function() {
+      // Hacer una solicitud AJAX a alumno.php para obtener el mensaje de bienvenida
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById("welcome-message").innerHTML = this.responseText;
+        }
+      };
+      xhttp.open("GET", "alumno.php", true);
+      xhttp.send();
+    };
+  </script>
   <script src="js/main.js"></script>
 
 </body>
