@@ -37,31 +37,11 @@ $stmt_materias = $pdo->prepare($sql_materias);
 $stmt_materias->bindParam(':alumno_id', $alumno_id, PDO::PARAM_INT);
 $stmt_materias->execute();
 
+
+$options  .='<option value>' . "Selecciona una opción". '</option>';
     while ($row = $stmt_materias->fetch(PDO::FETCH_ASSOC)) {
         $options .= '<option value="' . $row['materia_id'] . '">' . $row['nombre'] . '</option>';
     }
-
-/* Consultar el grupo_id asociado al alumno_id en la tabla matricula
-$sql_grupo = "SELECT grupo_id FROM matricula WHERE alumno_id = :alumno_id GROUP BY grupo_id";
-$stmt_grupo = $pdo->prepare($sql_grupo);
-$stmt_grupo->bindParam(':alumno_id', $alumno_id, PDO::PARAM_INT);
-$stmt_grupo->execute();
-
-$options = '';
-while ($row_grupo = $stmt_grupo->fetch(PDO::FETCH_ASSOC)) {
-    $grupo_id = $row_grupo['grupo_id'];
-
-    $sql_materias = "SELECT a.materia_id AS materia_id, m.nombre AS nombre FROM matricula a 
-                    JOIN materias m ON m.materia_id = a.materia_id
-                    WHERE a.grupo_id = :grupo_id GROUP BY nombre";
-    $stmt_materias = $pdo->prepare($sql_materias);
-    $stmt_materias->bindParam(':grupo_id', $grupo_id, PDO::PARAM_INT);
-    $stmt_materias->execute();
-
-    while ($row = $stmt_materias->fetch(PDO::FETCH_ASSOC)) {
-        $options .= '<option value="' . $row['materia_id'] . '">' . $row['nombre'] . '</option>';
-    }
-}*/
 
 echo $options;
 
