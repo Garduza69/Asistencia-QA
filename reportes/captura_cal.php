@@ -49,10 +49,11 @@ if ($stmt_usuario->num_rows > 0) {
 }
 
 // Verificar si se ha enviado el formulario
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Recuperar los valores seleccionados
-    $selected_materia = $_POST['materia'];
-    $selected_grupo = $_POST['grupos'];
+    $selected_materia = isset($_POST['materia']) ? $_POST['materia'] : '';
+    $selected_grupo = isset($_POST['grupos']) ? $_POST['grupos'] : '';
 
     // Consulta para obtener las calificaciones
     $sql_calificaciones = "SELECT 
@@ -95,6 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $calificaciones = [];
     while ($row = $result_calificaciones->fetch_assoc()) {
         $calificaciones[] = $row;
+		$alumno_ids[] = $row['alumno_id'];
     }
 
     $stmt_calificaciones->close();
@@ -224,111 +226,108 @@ $facultad = $db->query($fac);
                 </select>
             </div>
             
-            <button type="submit">Buscar</button>
+            <button type="submit" name="buscar">Buscar</button>
         </form>
 
         <!-- Tabla de calificaciones -->
-        <?php if ($_SERVER["REQUEST_METHOD"] == "POST"): ?>
-            <?php if (count($calificaciones) > 0): ?>
-                <table class="grades-table">
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-							<th>Matrícula</th>
-                            <th>Alumno</th>
-							<th>Parcial 1</th>
-							<th>Parcial 2</th>
-							<th>Parcial 3</th>
-							<th>Promedio</th>
-							<th>Ordinario</th>
-							<th>Ordinario 2</th>
-							
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <?php 
-                        // Crear un array para almacenar los valores del ciclo
-                        $valoresCiclo = [];
-
-                        // Recorrer los registros y construir la tabla
-                        for ($i = 0; $i < count($calificaciones); $i++): 
-                            // Almacenar los valores de interés en el array
-                            $valoresCiclo[] = [
-                                'indice' => $i + 1,
-                                'matricula' => $calificaciones[$i]['matricula'],
-                                'nombre_completo' => $calificaciones[$i]['nombre_completo'],
-								'materia_nombre' => $calificaciones[$i]['materia_nombre'],
-								'alumno_id' => $calificaciones[$i]['alumno_id'],
-							    'materia_id' => $calificaciones[$i]['materia_id'],
-								'nombre_docente' => $calificaciones[$i]['nombre_docente']
-                            ];
-                        ?>
+        <?php
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
+            if (count($calificaciones) > 0): ?>
+                <form method="post">
+                    <table class="grades-table">
+                        <thead>
                             <tr>
-                                <td><?php echo $i + 1; ?></td>
-                                <td><?php echo htmlspecialchars($calificaciones[$i]['matricula']); ?></td>
-                                <td><?php echo htmlspecialchars($calificaciones[$i]['nombre_completo']); ?></td>
-            
-                                <td contenteditable="true">0</td>
-                                <td contenteditable="true">0</td>
-                                <td contenteditable="true">0</td>
-                                <td contenteditable="true">0</td>
-                               <td contenteditable="true">0</td>
-                                <td contenteditable="true">0</td>
+                                <th>No.</th>
+                                <th>Matrícula</th>
+                                <th>Alumno</th>
+                                <th>Parcial 1</th>
+                                <th>Parcial 2</th>
+                                <th>Parcial 3</th>
+                                <th>Promedio</th>
+                                <th>Ordinario</th>
+                                <th>Ordinario 2</th>
                             </tr>
-                        <?php endfor; ?>
-                    </tbody>
+                        </thead>
+                        <tbody>
+                            <?php 
+                            // Crear un array para almacenar los valores del ciclo
+                            $valoresCiclo = [];
 
-                    <?php foreach ($valoresCiclo as $valor): ?>
-                        <p>Alumno ID: <?php echo htmlspecialchars($valor['alumno_id']); ?>, Docete: <?php echo htmlspecialchars($valor['nombre_docente']); ?>, Materia ID: <?php echo htmlspecialchars($valor['materia_id']); ?></p>
-                    <?php endforeach; ?>
-					<form method="post">
-    <button type="submit" name="registrar">Registrar</button>
-</form>
-<?php
-// Supongamos que ya tienes la conexión a la base de datos en la variable $conn
-
-foreach ($valoresCiclo as $valor) {
-
-    
-    // Valores de los parciales y otros campos que se deben insertar
-    $parcial_1 = 0.00; // Puedes reemplazar estos valores con los que necesites
-    $parcial_2 = 0.00;
-    $parcial_3 = 0.00;
-    $ordinario_1 = 0.00;
-    $ordinario_2 = 0.00;
-    $promedio = 0.00;
-    $usuario_alta = 'admin'; // Cambia esto según el usuario que esté creando el registro
-    $usuario_actualizacion = 'admin';
-
-    // Construcción de la consulta SQL
-    $sql = "INSERT INTO calificaciones 
-            (profesor_id, alumno_id, materia_id, parcial_1, parcial_2, parcial_3, ordinario_1, ordinario_2, promedio, usuario_alta, usuario_actualizacion) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    
-    // Preparación de la consulta
-    $stmt = $db->prepare($sql);
-
-    // Asignación de los valores a los parámetros
-    $stmt->bind_param("iiidddddsss", $profesor_id, $alumno_id, $materia_id, $parcial_1, $parcial_2, $parcial_3, $ordinario_1, $ordinario_2, $promedio, $usuario_alta, $usuario_actualizacion);
-
-    // Ejecución de la consulta
-    if ($stmt->execute()) {
-        echo "Registro insertado correctamente para el alumno ID: $alumno_id, Materia ID: $materia_id <br>";
-    } else {
-        echo "Error al insertar el registro: " . $stmt->error . "<br>";
-    }
-}
-
-// Cerrar la declaración y la conexión
-$stmt->close();
-$db->close();
-?>
-                </table>
+                            // Recorrer los registros y construir la tabla
+                            for ($i = 0; $i < count($calificaciones); $i++): 
+                                // Almacenar los valores de interés en el array
+                                $valoresCiclo[] = [
+                                    'indice' => $i + 1,
+                                    'matricula' => $calificaciones[$i]['matricula'],
+                                    'nombre_completo' => $calificaciones[$i]['nombre_completo'],
+                                    'materia_nombre' => $calificaciones[$i]['materia_nombre'],
+                                    'alumno_id' => $calificaciones[$i]['alumno_id'],
+                                    'materia_id' => $calificaciones[$i]['materia_id'],
+                                    'nombre_docente' => $calificaciones[$i]['nombre_docente']
+                                ];
+                            ?>
+                                <tr>
+                                    <td><?php echo $i + 1; ?></td>
+                                    <td><?php echo htmlspecialchars($calificaciones[$i]['matricula']); ?></td>
+                                    <td><?php echo htmlspecialchars($calificaciones[$i]['nombre_completo']); ?></td>
+                                    <td><input type="text" name="parcial_1_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" value="0" /></td>
+                                    <td><input type="text" name="parcial_2_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" value="0" /></td>
+                                    <td><input type="text" name="parcial_3_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" value="0" /></td>
+                                    <td><input type="text" name="promedio_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" value="0" readonly /></td>
+                                    <td><input type="text" name="ordinario_1_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" value="0" /></td>
+                                    <td><input type="text" name="ordinario_2_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" value="0" /></td>
+                                </tr>
+                            <?php endfor; ?>
+                        </tbody>
+                    </table>
+                    <input type="hidden" name="valores_ciclo" value='<?php echo htmlspecialchars(json_encode($valoresCiclo)); ?>'>
+                    <button type="submit" name="registrar">Registrar</button>
+                </form>
             <?php else: ?>
                 <p>No hay datos disponibles para la selección actual.</p>
-            <?php endif; ?>
-        <?php endif; ?>
+            <?php endif;
+        }
+
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['registrar'])) {
+            // Recuperar los valores de la tabla
+            $valoresCiclo = json_decode($_POST['valores_ciclo'], true);
+            
+            // Preparar la consulta SQL para insertar los registros
+            $sql = "INSERT INTO calificaciones 
+                    (profesor_id, alumno_id, materia_id, parcial_1, parcial_2, parcial_3, ordinario_1, ordinario_2, promedio, usuario_alta, usuario_actualizacion) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            
+            $stmt = $db->prepare($sql);
+
+            foreach ($valoresCiclo as $valor) {
+                // Obtener los valores de la tabla
+                $profesor_id = $valor['nombre_docente']; // Ajustar según el ID real del profesor
+                $alumno_id = $valor['alumno_id'];
+                $materia_id = $valor['materia_id'];
+                $parcial_1 = isset($_POST['parcial_1_' . $alumno_id]) ? floatval($_POST['parcial_1_' . $alumno_id]) : 0.00;
+                $parcial_2 = isset($_POST['parcial_2_' . $alumno_id]) ? floatval($_POST['parcial_2_' . $alumno_id]) : 0.00;
+                $parcial_3 = isset($_POST['parcial_3_' . $alumno_id]) ? floatval($_POST['parcial_3_' . $alumno_id]) : 0.00;
+                $ordinario_1 = isset($_POST['ordinario_1_' . $alumno_id]) ? floatval($_POST['ordinario_1_' . $alumno_id]) : 0.00;
+                $ordinario_2 = isset($_POST['ordinario_2_' . $alumno_id]) ? floatval($_POST['ordinario_2_' . $alumno_id]) : 0.00;
+                $promedio = ($parcial_1 + $parcial_2 + $parcial_3) / 3;
+                $usuario_alta = 'admin';
+                $usuario_actualizacion = 'admin';
+
+                // Asignación de los valores a los parámetros
+                $stmt->bind_param("iiidddddsss", $profesor_id, $alumno_id, $materia_id, $parcial_1, $parcial_2, $parcial_3, $ordinario_1, $ordinario_2, $promedio, $usuario_alta, $usuario_actualizacion);
+
+                // Ejecución de la consulta
+                if ($stmt->execute()) {
+                    echo "Registro insertado correctamente para el alumno ID: $alumno_id, Materia ID: $materia_id <br>";
+                } else {
+                    echo "Error al insertar el registro: " . $stmt->error . "<br>";
+                }
+            }
+
+            // Cerrar la sentencia después de que se haya usado
+            $stmt->close();
+        }
+        ?>
     </div>
 </body>
 </html>
