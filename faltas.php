@@ -1,9 +1,6 @@
 <?php
-// Configuración de la base de datos
-$servername = "localhost"; // Cambia localhost por el servidor de tu base de datos
-$username = "root"; // Cambia tu_usuario por el nombre de usuario de tu base de datos
-$password = ""; // Cambia tu_contraseña por la contraseña de tu base de datos
-$dbname = "u712195824_sistema2"; // Cambia login por el nombre de tu base de datos
+// Incluye el archivo de conexión a la base de datos
+include 'conexion2.php';
 // Inicia la sesión
 session_start();
 
@@ -11,13 +8,6 @@ session_start();
 if (isset($_SESSION['email'])) {
     $email_usuario = $_SESSION['email'];
 
-    // Crear conexión a la base de datos
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    // Verificar la conexión
-    if ($conn->connect_error) {
-        die("Error de conexión: " . $conn->connect_error);
-    }
 
     // Establecer la zona horaria a la Ciudad de México
     date_default_timezone_set("America/Mexico_City");
