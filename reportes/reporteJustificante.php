@@ -1,5 +1,4 @@
 <?php
-session_start();
 require('./fpdf.php');
 require('conexion2.php');
 
@@ -30,10 +29,7 @@ class PDFWithFooter extends FPDF {
         $this->Cell(0, 15, utf8_decode('Página ') . $this->PageNo(), 0, 0, 'R');
     }
 }
-// Verifica si el usuario ha iniciado sesión
-    //isset($_SESSION['email']); 
-    $email_usuario = $_SESSION['email'];
-    
+
 $pdf = new PDFWithFooter();
 $matricula = $_GET['matricula'];
 $dia_seleccionado = $_GET['dia_seleccionado'];
@@ -44,8 +40,6 @@ $fecha = $_GET['dia'];
 $consultaJustificacion = $db->query("UPDATE asistencia AS asis
 JOIN alumnos AS al ON asis.alumno_id = al.alumno_id
 SET asis.asistencia = 2
-,fecha_actualizacion = CONVERT_TZ(CURRENT_TIMESTAMP, '+00:00', '-06:00'), usuario_actualizacion = '$email_usuario'
-
 WHERE MONTH(asis.fecha_alta) = '".$mes."'
     AND DAY(asis.fecha_alta) = '".$dia_seleccionado."'
     AND al.matricula = '".$matricula."';");
@@ -78,7 +72,7 @@ $consultaEncabezado = $db->query("SELECT
             WHEN MONTH(asis.fecha_alta) = 11 THEN 'Noviembre'
             WHEN MONTH(asis.fecha_alta) = 12 THEN 'Diciembre'
         END) AS Mes,
-        s.nombre AS Semestre
+    s.nombre AS Semestre
 FROM 
     matricula mat
 JOIN 
@@ -94,7 +88,8 @@ JOIN
 WHERE 
     MONTH(asis.fecha_alta) = '".$mes."'
     AND DAY(asis.fecha_alta) = '".$dia_seleccionado."'
-    AND al.matricula =  '".$matricula."';");
+    AND al.matricula =  '".$matricula."'
+    AND gr.vigenciaSem = 1;");
 
 
 if($consultaEncabezado->num_rows > 0) {

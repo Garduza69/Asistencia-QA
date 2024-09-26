@@ -1,20 +1,27 @@
 <?php
-session_start();
 // Incluir el archivo de conexión a la base de datos
 require('conexion2.php');
-isset($_SESSION['tipo_usuario']);
-$tipo_usuario = $_SESSION['tipo_usuario'];
-
-if (!isset($_SESSION['loggedin']) || ($tipo_usuario != 4 && $tipo_usuario != 3) ) {
-    header("Location: ../index.php");
-    exit();
-}
 
 // Query para obtener las materias desde la base de datos
-$gpo = "select clave_grupo from grupos;";
-$fac = "select nombre from facultades;";
-$grupos = $db->query($gpo);
-$facultad = $db->query($fac);
+$queryFacultades = "SELECT 
+                        f.nombre AS nombre_facultad
+                    FROM matricula m
+                    JOIN grupos g ON m.grupo_id = g.grupo_id
+                    JOIN facultades f ON g.facultad_id = f.facultad_id
+                    WHERE g.vigenciaSem = 1
+                    GROUP BY f.nombre
+                    ORDER BY f.nombre;";
+
+$queryGrupos = "SELECT 
+						g.clave_grupo AS cve_grupo
+					FROM matricula m
+					JOIN grupos g ON m.grupo_id = g.grupo_id
+					JOIN facultades f ON g.facultad_id = f.facultad_id
+					WHERE g.vigenciaSem = 1
+					GROUP BY g.clave_grupo
+					ORDER BY g.clave_grupo;";
+$facultades = $db->query($queryFacultades);
+$grupos = $db->query($queryGrupos);
 ?>
 
 <!DOCTYPE html>
@@ -79,18 +86,15 @@ $facultad = $db->query($fac);
             <label for="facultad">Facultad:</label>
             <select name="facultad" id="facultad">
                 <?php
-                // Verificar si se obtuvieron resultados de la consulta
-                if ($facultad->num_rows > 0) {
+                // Verificar si se obtuvieron resultados de facultades
+                if ($facultades->num_rows > 0) {
                     // Iterar sobre los resultados y generar las opciones del combo box
-                    while ($row = $facultad->fetch_assoc()) {
-                        echo '<option value="' . $row["nombre"] . '">' . $row["nombre"] . '</option>';
+                    while ($row = $facultades->fetch_assoc()) {
+                        echo '<option value="' . $row["nombre_facultad"] . '">' . $row["nombre_facultad"] . '</option>';
                     }
                 } else {
-                    echo '<option value="">No hay Facultades disponibles</option>';
+                    echo '<option value="">No hay facultades disponibles</option>';
                 }
-
-                // Cerrar la consulta
-                $facultad->close();
                 ?>
             </select>
 
@@ -101,7 +105,7 @@ $facultad = $db->query($fac);
                 if ($grupos->num_rows > 0) {
                     // Iterar sobre los resultados y generar las opciones del combo box
                     while ($row = $grupos->fetch_assoc()) {
-                        echo '<option value="' . $row["clave_grupo"] . '">' . $row["clave_grupo"] . '</option>';
+                        echo '<option value="' . $row["cve_grupo"] . '">' . $row["cve_grupo"] . '</option>';
                     }
                 } else {
                     echo '<option value="">No hay grupos disponibles</option>';
