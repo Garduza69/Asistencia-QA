@@ -1,6 +1,9 @@
 <?php
-// Incluye el archivo de conexión a la base de datos
-include 'conexion2.php';
+// Configuración de la base de datos
+$servername = "localhost"; // Cambia localhost por el servidor de tu base de datos
+$username = "u712195824_sistema2"; // Cambia tu_usuario por el nombre de usuario de tu base de datos
+$password = "Cruzazul443"; // Cambia tu_contraseña por la contraseña de tu base de datos
+$dbname = "u712195824_sistema2"; // Cambia login por el nombre de tu base de datos
 
 // Inicia la sesión
 session_start();
@@ -8,6 +11,14 @@ session_start();
 // Verifica si el usuario ha iniciado sesión
 if (isset($_SESSION['email'])) {
     $email_usuario = $_SESSION['email'];
+
+    // Crear conexión a la base de datos
+    $conn = new mysqli($servername, $username, $password, $dbname);
+
+    // Verificar la conexión
+    if ($conn->connect_error) {
+        die("Error de conexión: " . $conn->connect_error);
+    }
 
     // Consultar el idUsuario asociado al correo del usuario actual
     $sql_usuario = "SELECT idUsuario FROM usuario WHERE Email = '$email_usuario'";
