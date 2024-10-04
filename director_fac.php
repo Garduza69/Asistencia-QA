@@ -111,6 +111,7 @@ header("Pragma: no-cache");
               </li>
             </ul>
           </li>
+		<li class="menu-active"><a href="cerrar_sesion.php">Cerrar sesión</a></li>	
         </ul>
       </nav><!-- #nav-menu-container -->
     </div>
