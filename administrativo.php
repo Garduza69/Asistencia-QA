@@ -1,10 +1,14 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['loggedin'])) {
+isset($_SESSION['tipo_usuario']);
+$tipo_usuario = $_SESSION['tipo_usuario'];
+
+if (!isset($_SESSION['loggedin']) || $tipo_usuario != 3 ) {
     header("Location: index.php");
     exit();
 }
+
 
 
 // Evitar almacenamiento en caché
@@ -99,8 +103,10 @@ header("Pragma: no-cache");
 
       <nav id="nav-menu-container">
         <ul class="nav-menu">
+          
           <li class="menu-active"><a href="#intro">Inicio</a></li>
           <li class="menu-has-children"><a href="">Asistencia</a>
+			  
             <ul>
               <li class="menu-has-children"><a>Consultar Listas</a>
                 <ul>
@@ -109,6 +115,7 @@ header("Pragma: no-cache");
                 </ul>
               </li>
             </ul>
+		 <li class="menu-active"><a href="cerrar_sesion.php">Cerrar sesión</a></li>	  
           </li>
         </ul>
       </nav><!-- #nav-menu-container -->
@@ -212,6 +219,7 @@ header("Pragma: no-cache");
         };
         xhttpAuth.open("GET", "verificar_autenticacion.php", true);
         xhttpAuth.send();
+
     };
 </script>
   <script src="lib/jquery/jquery.min.js"></script>
