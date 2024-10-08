@@ -2,17 +2,15 @@
 session_start();
 
 require 'phpqrcode/qrlib.php';
-require_once "conexion.php";
+require_once "conexion2.php";
 
 // Verificar si el usuario está autenticado y obtener su correo electrónico
 if (isset($_SESSION['email'])) {
     $email = $_SESSION['email'];
 
     // Consultar el idUsuario del usuario autenticado
-    $stmt_usuario = $pdo->prepare("SELECT idUsuario FROM usuario WHERE Email = :email");
-    $stmt_usuario->bindParam(":email", $email);
-    $stmt_usuario->execute();
-    $row_usuario = $stmt_usuario->fetch(PDO::FETCH_ASSOC);
+    $stmt_usuario = $db->query("SELECT idUsuario FROM usuario WHERE Email = '$email'");
+    $row_usuario = $stmt_usuario->fetch_assoc();
 
     if ($row_usuario) {
         $userId = $row_usuario['idUsuario'];
@@ -30,11 +28,11 @@ $token = bin2hex(random_bytes(16)); // Generar un token hexadecimal de 16 bytes
 
 // Insertar el token, correo electrónico, idUsuario y materia_id en la tabla codigos_qr
 $sql = "INSERT INTO codigos_qr (token, correo, id_usuario) VALUES (?, ?, ?)";
-$stmt_insert = $pdo->prepare($sql);
-$stmt_insert->bindParam(1, $token, PDO::PARAM_STR);
-$stmt_insert->bindParam(2, $email, PDO::PARAM_STR);
-$stmt_insert->bindParam(3, $userId, PDO::PARAM_INT);
+$stmt_insert = $db->prepare($sql);
+ // Enlazar los parámetros a la consulta preparada (tipos: string, string, integer)
+$stmt_insert->bind_param('ssi', $token, $email, $userId); // 'ssi' = 2 strings y 1 integer
 $stmt_insert->execute();
+$stmt_insert->close();
 
 
 // Obtener el materia_id seleccionado desde la solicitud GET
@@ -42,19 +40,22 @@ if (isset($_GET['materia_id'])) {
     $materia_id = $_GET['materia_id'];
 
     // Consultar el id_codigo asociado al codigo qr recien creado
-    $sql_codigo = "SELECT id_codigo FROM codigos_qr WHERE  token= :token";
-    $stmt_codigo = $pdo->prepare($sql_codigo);
-    $stmt_codigo->bindParam(':token', $token, PDO::PARAM_STR);
+    $sql_codigo = "SELECT id_codigo FROM codigos_qr WHERE  token= ?";
+    $stmt_codigo = $db->prepare($sql_codigo);
+    $stmt_codigo->bind_param('s', $token);
     $stmt_codigo->execute();
-    $row_codigo = $stmt_codigo->fetch(PDO::FETCH_ASSOC);
+    // Obtener el resultado de la consulta
+    $result_codigo = $stmt_codigo->get_result();
+    //extraer los datos de la consulta
+    $row_codigo = $result_codigo->fetch_assoc();
     $id_codigo = $row_codigo['id_codigo'];
 
     // Insertar el id_codigo ligado al código qr creado y la materia_id
-    $sql = "INSERT INTO materia_qr (id_codigo, materia_id) VALUES (?, ?)";
-    $stmt_insertmat = $pdo->prepare($sql);
-    $stmt_insertmat->bindParam(1, $id_codigo, PDO::PARAM_INT);
-    $stmt_insertmat->bindParam(2, $materia_id, PDO::PARAM_INT);
+    $sql = "INSERT INTO materia_qr (id_codigo, materia_id) VALUES ( ?, ?)";
+    $stmt_insertmat = $db->prepare($sql);
+    $stmt_insertmat->bind_param('ii', $id_codigo, $materia_id);
     $stmt_insertmat->execute();
+    $stmt_insertmat->close();
 
 } else {
     // Manejar el error si no se proporciona un materia_id

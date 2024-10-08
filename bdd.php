@@ -1,16 +1,10 @@
 <?php
-// Datos de conexión a la base de datos
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "u712195824_sistema2";
-
-// Crear conexión
-$conn = new mysqli($servername, $username, $password, $dbname);
+// Incluye el archivo de conexión a la base de datos
+include 'conexion2.php';
 
 // Verificar la conexión
-if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+if ($db->connect_error) {
+    die("Error de conexión: " . $db->connect_error);
 }
 
 // Verificar que se ha enviado el id_usuario
@@ -34,14 +28,14 @@ $sql = "INSERT INTO alumnos (nombre, primer_apellido, segundo_apellido, matricul
         VALUES ('$nombre', '$primer_apellido', '$segundo_apellido', '$matricula', '$curp', '$fecha_nacimiento', '$sexo', '$id_usuario')";
 
 // Ejecutar la consulta
-if ($conn->query($sql) === TRUE) {
+if ($db->query($sql) === TRUE) {
     // Redirigir a success_alumno.php si se agregó correctamente
     header("Location: success_alumno.php");
     exit();
 } else {
-    echo "Error: " . $conn->error;
+    echo "Error: " . $db->error;
 }
 
 // Cerrar la conexión
-$conn->close();
+$db->close();
 ?>

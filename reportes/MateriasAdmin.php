@@ -1,7 +1,7 @@
 <?php
 session_start();
 // Incluir el archivo de conexión a la base de datos
-require('conexion2.php');
+require('../conexion2.php');
 
 
 isset($_SESSION['tipo_usuario']);

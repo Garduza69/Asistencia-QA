@@ -1,6 +1,6 @@
 <?php
 require('./fpdf.php');
-require('conexion2.php');
+require('../conexion2.php');
 
 
 class PDFWithFooter extends FPDF {

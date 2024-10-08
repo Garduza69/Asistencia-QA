@@ -3,7 +3,7 @@
 session_start();
 
 // Incluye el archivo de conexión a la base de datos
-include 'conexion.php';
+include 'conexion2.php';
  
 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
     header("location: verificar_usuario.php");

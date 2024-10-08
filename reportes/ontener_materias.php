@@ -1,6 +1,6 @@
 <?php
 // Incluir la conexión a la base de datos
-require('conexion2.php');
+require('../conexion2.php');
 
 if (isset($_POST['grupo'])) {
     $grupoSeleccionado = $_POST['grupo'];

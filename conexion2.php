@@ -6,7 +6,7 @@ $password = "Cruzazul443";
 $dbname = "u712195824_sistema2";
 
 // Intentar establecer la conexión
-$conn = new mysqli($servername, $username, $password, $dbname);
+$db = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
     die("la conexión ha fallado: " . $conn->connect_error);

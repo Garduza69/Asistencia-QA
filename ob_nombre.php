@@ -2,7 +2,7 @@
 session_start();
 
 // Incluye el archivo de conexión a la base de datos
-include 'conexion.php';
+include 'conexion2.php';
 
 // Check if the user is logged in, if not then redirect him to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
@@ -14,7 +14,7 @@ if (isset($_SESSION['email'])) {
     $email = $_SESSION['email'];
 
     // Llama a la función para obtener el nombre asociado al correo electrónico
-    $nombre = obtener_nombre($email, $pdo);
+    $nombre = obtener_nombre($email, $db);
 
     // Muestra el mensaje de bienvenida personalizado
     echo "<h1>Bienvenido, $nombre</h1>";
@@ -23,21 +23,22 @@ if (isset($_SESSION['email'])) {
 }
 
 // Función para obtener el nombre asociado al correo electrónico en la base de datos
-function obtener_nombre($email, $conn) {
+function obtener_nombre($email, $db) {
     // Query para obtener el nombre basado en el correo electrónico
-    $query = "SELECT nombre FROM usuario WHERE email = :email";
+    $query = "SELECT nombre FROM usuario WHERE email = ?";
 
     // Preparar la consulta
-    $stmt = $conn->prepare($query);
+    $stmt = $db->prepare($query);
 
     // Bind de parámetros
-    $stmt->bindParam(':email', $email);
+    $stmt->bind_param('s', $email);
 
     // Ejecutar la consulta
     $stmt->execute();
-
-    // Obtener el resultado
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Obtener el resultado de la consulta
+    $result_nombre = $stmt->get_result();
+    // extraer el resultado
+    $row = $result_nombre->fetch_assoc();
 
     // Devolver el nombre si se encontró, de lo contrario, devuelve un mensaje predeterminado
     return $row ? $row['nombre'] : "Estudiante";
