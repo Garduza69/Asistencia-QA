@@ -2,34 +2,29 @@
 session_start();
 
 // Incluimos el archivo de conexión a la base de datos
-include 'conexion.php';
+include 'conexion2.php';
 
 // Verificamos si hay un correo electrónico enviado desde verificar_usuario.php
 if (isset($_SESSION['email'])) {
     $email = $_SESSION['email'];
 
     // Llamamos a la función para verificar el tipo de usuario y redirigir según el tipo
-    redirigir_según_tipo($email, $pdo); // Pasamos la conexión como argumento
+    redirigir_según_tipo($email, $db); // Pasamos la conexión como argumento
 } else {
     echo "No se proporcionó un correo electrónico.";
 }
 
 // Función para verificar el tipo de usuario en la base de datos y redirigir
-function redirigir_según_tipo($email, $conn) {
+function redirigir_según_tipo($email, $db) {
     // Query para consultar el tipo de usuario basado en el correo electrónico
-    $query = "SELECT id_perfil FROM usuario WHERE email = :email";
+    $query = "SELECT id_perfil FROM usuario WHERE email = '$email'";
     
     // Preparamos la consulta
-    $stmt = $conn->prepare($query);
-
-    // Bind de parámetros
-    $stmt->bindParam(':email', $email);
-
-    // Ejecutamos la consulta
-    $stmt->execute();
+    $stmt = $db->query($query);
 
     // Obtenemos el resultado
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $row= $stmt->fetch_assoc();
+           // $profesor_id = $row_profesor['profesor_id'];
 
     if ($row) {
         // Si se encontró el correo en la tabla registros, obtenemos el tipo de usuario

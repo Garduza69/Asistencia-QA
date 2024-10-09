@@ -11,21 +11,21 @@ if (isset($_SESSION['email'])) {
 
     // Consultar el idUsuario asociado al correo del usuario actual
     $sql_usuario = "SELECT idUsuario FROM usuario WHERE Email = '$email_usuario'";
-    $result_usuario = $conn->query($sql_usuario);
+    $result_usuario = $db->query($sql_usuario);
     if ($result_usuario->num_rows > 0) {
         $row_usuario = $result_usuario->fetch_assoc();
         $id_usuario = $row_usuario['idUsuario'];
 
         // Consultar el profesor_id asociado al idUsuario en la tabla profesores
         $sql_profesor = "SELECT profesor_id FROM profesores WHERE id_usuario = '$id_usuario'";
-        $result_profesor = $conn->query($sql_profesor);
+        $result_profesor = $db->query($sql_profesor);
         if ($result_profesor->num_rows > 0) {
             $row_profesor = $result_profesor->fetch_assoc();
             $profesor_id = $row_profesor['profesor_id'];
 
             // Consultar las materias que imparte el profesor en la tabla horarios
             $sql_materias = "SELECT materia_id FROM horarios WHERE profesor_id = '$profesor_id'";
-            $result_materias = $conn->query($sql_materias);
+            $result_materias = $db->query($sql_materias);
             $materias_imparte = [];
             while ($row_materia = $result_materias->fetch_assoc()) {
                 $materias_imparte[] = $row_materia['materia_id'];
@@ -37,7 +37,7 @@ if (isset($_SESSION['email'])) {
 
                 // Consultar la materia asociada al token en la tabla codigos_qr
                 $sql_select = "SELECT id_codigo, id_usuario, used FROM codigos_qr WHERE token = '$token'";
-                $result_select = $conn->query($sql_select);
+                $result_select = $db->query($sql_select);
 
                 // Verificar si se encontró el token en la base de datos
                 if ($result_select->num_rows > 0) {
@@ -48,7 +48,7 @@ if (isset($_SESSION['email'])) {
                     $used = $row_select['used'];
 
                     $sql_selectmat = "SELECT materia_id FROM materia_qr WHERE id_codigo = '$id_codigo'";
-                    $result_selectmat = $conn->query($sql_selectmat);
+                    $result_selectmat = $db->query($sql_selectmat);
                     // Obtener el materia_id
                     $row_selectmat = $result_selectmat->fetch_assoc();
                     $materia_id = $row_selectmat['materia_id'];
@@ -60,7 +60,7 @@ if (isset($_SESSION['email'])) {
                         if (in_array($materia_id, $materias_imparte)) {
                             // Consultar el alumno_id asociado al id_usuario en la tabla alumnos
                             $sql_alumno = "SELECT alumno_id FROM alumnos WHERE id_usuario = '$id_usuario'";
-                            $result_alumno = $conn->query($sql_alumno);
+                            $result_alumno = $db->query($sql_alumno);
 
                             // Verificar si se encontró un alumno asociado al id_usuario
                             if ($result_alumno->num_rows > 0) {
@@ -76,7 +76,7 @@ if (isset($_SESSION['email'])) {
 
                                 // Verificar si la asistencia es NULL o 0
                                 $sql_check_attendance = "SELECT asistencia FROM asistencia WHERE materia_id = '$materia_id' AND alumno_id = '$alumno_id' AND fecha_alta = '$fecha_actual'";
-                                $result_check_attendance = $conn->query($sql_check_attendance);
+                                $result_check_attendance = $db->query($sql_check_attendance);
                                 if ($result_check_attendance->num_rows > 0) {
                                     $row_attendance = $result_check_attendance->fetch_assoc();
                                     $attendance = $row_attendance['asistencia'];
@@ -86,9 +86,9 @@ if (isset($_SESSION['email'])) {
                                         WHERE materia_id = '$materia_id' AND alumno_id = '$alumno_id' AND fecha_alta = '$fecha_actual' ";
 
                                         // Ejecutar la consulta de actualización
-                                        if ($conn->query($sql_update) === TRUE) {
+                                        if ($db->query($sql_update) === TRUE) {
                                             // Verificar si se actualizó algún registro
-                                            if ($conn->affected_rows > 0) {
+                                            if ($db->affected_rows > 0) {
                                                 // Si se actualizó correctamente, muestra el mensaje de éxito
                                                 // Después de procesar el registro de asistencia con éxito
                                                 header("Location: send_email.php?token=$token&result=1");
@@ -131,7 +131,7 @@ if (isset($_SESSION['email'])) {
                         }
                         // Actualizar el campo 'used' a 1
                         $sql_update_used = "UPDATE codigos_qr SET used = 1 WHERE token = '$token'";
-                        $conn->query($sql_update_used);
+                        $db->query($sql_update_used);
                     }else{
                         if($used == 1){
                         // manda el mensaje si el código QR ya fue usado
@@ -167,7 +167,7 @@ if (isset($_SESSION['email'])) {
 }
 
 // Cerrar la conexión
-$conn->close();
+$db->close();
 
 ?>
 

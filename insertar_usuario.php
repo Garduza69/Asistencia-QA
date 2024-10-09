@@ -10,18 +10,11 @@
     <h2>Agregar Nuevo Usuario</h2>
 
     <?php
-    // Datos de conexión a la base de datos
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "u712195824_sistema2";
-
-    // Crear conexión
-    $conn = new mysqli($servername, $username, $password, $dbname);
+    include 'conexion2.php';
 
     // Verificar la conexión
-    if ($conn->connect_error) {
-        die("Error de conexión: " . $conn->connect_error);
+    if ($db->connect_error) {
+        die("Error de conexión: " . $db->connect_error);
     }
 
     // Si se ha enviado el formulario
@@ -38,11 +31,11 @@
                 VALUES ('$nombre', '$apellidos', '$id_perfil', '$email', '$password', NULL, NOW(), NOW())";
 
         // Ejecutar la consulta
-        if ($conn->query($sql) === TRUE) {
+        if ($db->query($sql) === TRUE) {
             header("Location: success_usuario.php"); // Redirigir a la página de éxito
             exit();
         } else {
-            echo "Error: " . $conn->error;
+            echo "Error: " . $db->error;
         }
     }
 
@@ -64,7 +57,7 @@
             <?php
             // Obtener los perfiles disponibles desde la tabla perfil
             $sql = "SELECT id_perfil, nombre_perfil FROM perfil";
-            $result = $conn->query($sql);
+            $result = $db->query($sql);
 
             if ($result->num_rows > 0) {
                 while($row = $result->fetch_assoc()) {

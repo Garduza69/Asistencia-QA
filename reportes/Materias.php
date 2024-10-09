@@ -1,6 +1,6 @@
 <?php
 // Incluir el archivo de conexión a la base de datos
-require('conexion2.php');
+require('../conexion2.php');
 
 // Obtener facultades y grupos
 $queryFacultades = "SELECT 

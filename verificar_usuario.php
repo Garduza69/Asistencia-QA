@@ -13,13 +13,15 @@ if (isset($_SESSION['email'])) {
 
     // Consulta la base de datos para verificar si el correo electrónico está en la tabla usuario
     // Reemplaza 'conexion.php' con el nombre de tu archivo de conexión a la base de datos
-    include 'conexion.php'; // Incluye el archivo de conexión
+    include 'conexion2.php'; // Incluye el archivo de conexión
 
-    $stmt = $pdo->prepare("SELECT * FROM usuario WHERE email = ?");
-    $stmt->execute([$email]);
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $db->prepare("SELECT * FROM usuario WHERE email = ?");
+    $stmt->bind_param('s',$email);
+    $stmt->execute();
+    $result_stmt = $stmt->get_result();
+    $usuario = $result_stmt->fetch_assoc();
 
-    // Si el usuario existe en la base de datos, redirige a la página protegida (cuenta.html)
+    // Si el usuario existe en la base de datos, redirige a la página protegida (cuenta.php)
     if ($usuario) {
         header("Location: cuenta.php");
         exit();

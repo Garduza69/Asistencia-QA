@@ -13,17 +13,4 @@ $client->setRedirectUri($redirectUri);
 $client->addScope("email");
 $client->addScope("profile");
 
-// Configuración de la conexión PDO a la base de datos
-$host = 'localhost';
-$dbname = 'u712195824_sistema2'; // Nombre de tu base de datos
-$username = 'u712195824_sistema2'; // Nombre de usuario de la base de datos
-$password = 'Cruzazul443'; // Contraseña de la base de datos
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    // Configuración de PDO para manejar errores y excepciones
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Error al conectar a la base de datos: " . $e->getMessage());
-}
 ?>

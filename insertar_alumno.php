@@ -69,23 +69,16 @@
     <select id="id_usuario" name="id_usuario" required>
       <option value="">Seleccione un Usuario</option>
       <?php
-      // Conectar a la base de datos para obtener los usuarios
-      $servername = "localhost";
-      $username = "root";
-      $password = "";
-      $dbname = "u712195824_sistema2";
-
-      // Crear conexión
-      $conn = new mysqli($servername, $username, $password, $dbname);
+      include 'conexion2.php';
 
       // Verificar conexión
-      if ($conn->connect_error) {
-          die("Error en la conexión: " . $conn->connect_error);
+      if ($db->connect_error) {
+          die("Error en la conexión: " . $db->connect_error);
       }
 
       // Consulta para obtener todos los usuarios
       $sql = "SELECT idUsuario, email FROM usuario";
-      $result = $conn->query($sql);
+      $result = $db->query($sql);
 
       // Verificar si hay resultados y crear las opciones del select
       if ($result->num_rows > 0) {
@@ -97,7 +90,7 @@
       }
 
       // Cerrar la conexión
-      $conn->close();
+      $db->close();
       ?>
     </select><br>
 

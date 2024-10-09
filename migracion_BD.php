@@ -1,16 +1,9 @@
 <?php
-// Configuración de la base de datos
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "u712195824_sistema2";
-
-// Crear la conexión
-$conn = new mysqli($servername, $username, $password, $dbname);
+include 'conexion2.php';
 
 // Verificar la conexión
-if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
+if ($db->connect_error) {
+    die("Conexión fallida: " . $db->connect_error);
 }
 
 // Nombre único de la migración
@@ -19,7 +12,7 @@ $lote = 1;
 
 // Verificar si la migración ya fue aplicada
 $verificar_sql = "SELECT * FROM migraciones WHERE nombre_migracion = '$nombre_migracion'";
-$resultado = $conn->query($verificar_sql);
+$resultado = $db->query($verificar_sql);
 
 if ($resultado->num_rows == 0) {
     // Si no ha sido aplicada, crear la tabla 'pruebas'
@@ -30,19 +23,19 @@ if ($resultado->num_rows == 0) {
         fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     
-    if ($conn->query($sql_migraciones) === TRUE) {
+    if ($db->query($sql_migraciones) === TRUE) {
         echo "Migración aplicada exitosamente: tabla 'pruebas' creada.<br>";
 
         // Registrar la migración en la tabla 'migraciones'
         $sql_registrar_migracion = "INSERT INTO migraciones (nombre_migracion, lote) VALUES ('$nombre_migracion', $lote)";
         
-        if ($conn->query($sql_registrar_migracion) === TRUE) {
+        if ($db->query($sql_registrar_migracion) === TRUE) {
             echo "Migración registrada en la tabla 'migraciones'.<br>";
         } else {
-            echo "Error al registrar la migración: " . $conn->error . "<br>";
+            echo "Error al registrar la migración: " . $db->error . "<br>";
         }
     } else {
-        echo "Error al aplicar la migración: " . $conn->error . "<br>";
+        echo "Error al aplicar la migración: " . $db->error . "<br>";
     }
 } else {
     echo "La migración '$nombre_migracion' ya ha sido aplicada anteriormente.<br>";
@@ -50,7 +43,7 @@ if ($resultado->num_rows == 0) {
 
 // Verificación de registro
 $consulta_verificar = "SELECT * FROM migraciones WHERE nombre_migracion = '$nombre_migracion'";
-$resultado_verificacion = $conn->query($consulta_verificar);
+$resultado_verificacion = $db->query($consulta_verificar);
 
 if ($resultado_verificacion->num_rows > 0) {
     echo "La migración '$nombre_migracion' ha sido registrada correctamente.<br>";
@@ -59,5 +52,5 @@ if ($resultado_verificacion->num_rows > 0) {
 }
 
 // Cerrar la conexión
-$conn->close();
+$db->close();
 ?>
