@@ -236,6 +236,19 @@ header("Pragma: no-cache");
 
   <!-- Template Main Javascript File -->
   <script src="js/main.js"></script>
-
+	
+<script>
+    window.onload = function() {
+        // Hacer una solicitud AJAX a docente.php para obtener el mensaje de bienvenida
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("welcome-message").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "ob_nombre.php", true);
+        xhttp.send();
+    };
+</script>
 </body>
 </html>

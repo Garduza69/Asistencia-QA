@@ -82,7 +82,7 @@ $grupos = $db->query($queryGrupos);
 <body>
     <div class="container">
         <h1>Formulario de Selección</h1>
-        <form action="procesar_facultad.php" method="post">
+        <form action="lib/procesadores/procesar_facultad.php" method="post">
             <label for="facultad">Facultad:</label>
             <select name="facultad" id="facultad">
                 <?php

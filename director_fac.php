@@ -97,7 +97,7 @@ header("Pragma: no-cache");
 		<li class="menu-has-children"><a href="">Inicio</a></li>
           <li class="menu-has-children"><a href="">Justificantes</a>
             <ul>
-                <li><a href="reportes/Materias.php">Consultar Asistencia</a></li>
+                <li><a href="">Consultar Asistencia</a></li>
                 <li><a href="reportes/Justificantes.php">Generar Justificante</a></li>
             </ul>
           </li>
@@ -105,7 +105,7 @@ header("Pragma: no-cache");
             <ul>
               <li class="menu-has-children"><a>Generar Lista</a>
                 <ul>
-                  <li><a href="reportes/Materias.php">Lista por Materia</a></li>
+                  <li><a href="reportes/MateriasAdmin.php">Lista por Materia</a></li>
                   <li><a href="reportes/Facultades.php">Lista por Facultad</a></li>
                 </ul>
               </li>
@@ -189,18 +189,19 @@ header("Pragma: no-cache");
 
 
   <!-- JavaScript Libraries -->
-  <script> window.onload = function() {
-            // Hacer una solicitud AJAX a director_fac.php para obtener el mensaje de bienvenida
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    document.getElementById("welcome-message").innerHTML = this.responseText;
-                }
-            };
-            xhttp.open("GET", "../ob_nombre.php", true);
-            xhttp.send();
+<script>
+    window.onload = function() {
+        // Hacer una solicitud AJAX a docente.php para obtener el mensaje de bienvenida
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("welcome-message").innerHTML = this.responseText;
+            }
         };
- </script>
+        xhttp.open("GET", "ob_nombre.php", true);
+        xhttp.send();
+    };
+</script>
   <script src="lib/jquery/jquery.min.js"></script>
   <script src="lib/jquery/jquery-migrate.min.js"></script>
   <script src="lib/bootstrap/js/bootstrap.bundle.min.js"></script>
