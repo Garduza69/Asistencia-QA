@@ -15,7 +15,7 @@ if (isset($_POST['matricula']) && isset($_POST['dia_seleccionado']) && isset($_P
 	echo "Fecha seleccionado: $fecha_seleccionada<br>";
 	
     // Redirigir a otro archivo con los datos como parámetros GET
-    header("Location: reporteJustificante.php?matricula=$matricula_seleccionada&dia_seleccionado=$dia_seleccionado&mes=$mes_seleccionado&motivo_seleccionado=$motivo_seleccionado&dia=$fecha_seleccionada");
+    header("Location: generador/reporteJustificante.php?matricula=$matricula_seleccionada&dia_seleccionado=$dia_seleccionado&mes=$mes_seleccionado&motivo_seleccionado=$motivo_seleccionado&dia=$fecha_seleccionada");
     exit; // Asegúrate de salir del script después de la redirección
 
 } else {

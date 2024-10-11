@@ -1,11 +1,13 @@
 <?php
 session_start();
-// Incluir el archivo de conexión a la base de datos
-require('../conexion2.php');
+require('conexion2.php');
 
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: index.php");
+    exit;
+}
 
-//Recupera el email del usuario
-$email_usuario = 'abel.ramirez@us.edu.mx';
+$email_usuario = $_SESSION['email'];
 
 // Consultar el idUsuario asociado al correo del usuario actual
 $sql_usuario = "SELECT idUsuario FROM usuario WHERE Email = ?";
@@ -34,7 +36,7 @@ if ($stmt_usuario->num_rows > 0) {
                 FROM horarios h 
                 JOIN materias m ON m.materia_id = h.materia_id
                 JOIN grupos g ON g.grupo_id = h.grupo_id
-                WHERE h.profesor_id = ?
+                WHERE h.profesor_id = ? and g.vigenciaSem = 1
                 GROUP BY m.nombre, g.clave_grupo;";
         $stmt_materias = $db->prepare($sql_materias);
         $stmt_materias->bind_param("i", $profesor_id);
@@ -42,8 +44,9 @@ if ($stmt_usuario->num_rows > 0) {
         $result_materias = $stmt_materias->get_result();
         
         while ($row = $result_materias->fetch_assoc()) {
-            $options_materias .= '<option value="' . $row['nombre'] . '">' . $row['nombre'] . '</option>';
 			$options_grupos .= '<option value="' . $row['Grupos'] . '">' . $row['Grupos'] . '</option>';
+            $options_materias .= '<option value="' . $row['nombre'] . '">' . $row['nombre'] . '</option>';
+
         }
     }
 }
