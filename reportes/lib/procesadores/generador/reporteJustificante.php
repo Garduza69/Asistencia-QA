@@ -1,6 +1,6 @@
 <?php
 require('./fpdf.php');
-require('../conexion2.php');
+require('../../../conexion2.php');
 
 
 class PDFWithFooter extends FPDF {
@@ -96,8 +96,8 @@ if($consultaEncabezado->num_rows > 0) {
     while ($fila = $consultaEncabezado->fetch_assoc()) {
         $pdf->AddPage('L', array(279.4, 148));
         $pdf->AliasNbPages();
-        $pdf->Image('./img/logoSotavento.png', 22.5, 7.5, 25);
-        $pdf->Image('./img/IQS.jpg', 232.5, 7.5, 25);
+        $pdf->Image('../../../img/logoSotavento.png', 22.5, 7.5, 25);
+        $pdf->Image('../../../img/IQS.jpg', 232.5, 7.5, 25);
         $pdf->SetFont('Arial', 'B', 17);
         $pdf->Cell(100);
         $pdf->SetTextColor(0, 0, 0);

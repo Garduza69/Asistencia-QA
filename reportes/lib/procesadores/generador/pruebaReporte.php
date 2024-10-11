@@ -1,6 +1,6 @@
 <?php
 require('./fpdf.php');
-require('../conexion2.php');
+require('../../../conexion2.php');
 
 class PDFWithFooter extends FPDF {
     // Pie de página
@@ -138,7 +138,7 @@ if($consultaEncabezado->num_rows > 0){
         $pdf->AliasNbPages();
 
 		            // Configuración del logo
-        $pdf->Image('UNAM.jpg', 15, 5, 20); //logo de la empresa, moverDerecha, moverAbajo, tamañoIMG
+        $pdf->Image('../../../img/UNAM.jpg', 15, 5, 20); //logo de la empresa, moverDerecha, moverAbajo, tamañoIMG
             // Título 1
         $pdf->SetFont('Arial', 'B', 13); //tipo fuente, negrita(B-I-U-BIU), tamañoTexto
         $pdf->Cell(95); // Movernos a la derecha
