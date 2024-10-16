@@ -27,7 +27,7 @@
     </div>
 
     <div class="menu-item">
-      <a href="insertar_docente.php">
+      <a href="insertar_profesor.php">
         <img src="icons/professor.png" alt="Profesor">
         <span>Profesor</span>
       </a>
@@ -41,7 +41,7 @@
     </div>
 
     <div class="menu-item">
-      <a href="#">
+      <a href="crear_horario.php">
         <img src="icons/calendar.png" alt="Horario">
         <span>Horario</span>
       </a>
