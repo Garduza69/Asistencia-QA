@@ -1,6 +1,6 @@
 <?php
 require('./fpdf.php');
-require('../../../conexion2.php');
+require('../../../../conexion2.php');
 
 
 class PDFWithFooter extends FPDF {
@@ -31,18 +31,7 @@ class PDFWithFooter extends FPDF {
 }
 
 $pdf = new PDFWithFooter();
-$matricula = $_GET['matricula'];
-$dia_seleccionado = $_GET['dia_seleccionado'];
-$mes = $_GET['mes'];
-$motivo = $_GET['motivo_seleccionado'];
-$fecha = $_GET['dia'];
 
-$consultaJustificacion = $db->query("UPDATE asistencia AS asis
-JOIN alumnos AS al ON asis.alumno_id = al.alumno_id
-SET asis.asistencia = 2
-WHERE MONTH(asis.fecha_alta) = '".$mes."'
-    AND DAY(asis.fecha_alta) = '".$dia_seleccionado."'
-    AND al.matricula = '".$matricula."';");
 
 $pdf->SetTitle('Justificante', true);
 

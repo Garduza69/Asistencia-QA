@@ -32,6 +32,7 @@ $sql_materias = "SELECT a.materia_id AS materia_id, m.nombre AS nombre
 $stmt_materias = $db->query($sql_materias);
 
 $options  .='<option value>' . "Selecciona una opción". '</option>';
+$options  .='<option value>' . "Calificaciones". '</option>';
     while ($row = $stmt_materias->fetch_assoc()) {
         $options .= '<option value="' . $row['materia_id'] . '">' . $row['nombre'] . '</option>';
     }

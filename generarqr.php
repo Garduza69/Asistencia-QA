@@ -163,19 +163,36 @@ header("Pragma: no-cache");
                   $('#materia').html(data);
               }
           });
-          // Generar código QR al seleccionar una materia
-          $('#materia').change(function(){
-              var materiaSeleccionada = $(this).val();
-              $.ajax({
-                  type: 'GET',
-                  url: 'generate_qr.php',
-                  data: { materia_id: materiaSeleccionada }, // Enviar el materia_id seleccionado
-                  success: function(data){
-                      var qr_image = $('<img>').attr('src', data);
-                      $('#qr_code').html(qr_image);
-                  }
-              });
-          });
+
+          // Generar código QR al cambiar la opción seleccionada
+        $('#materia').change(function(){
+            var materiaSeleccionada = $(this).val();
+
+            // Verificar si la opción seleccionada es 'calificaciones' o es null
+            if (materiaSeleccionada === null || materiaSeleccionada === "") {
+                $.ajax({
+                    type: 'GET',
+                    url: 'generate_qr.php',
+                    success: function(data){
+                        var qr_image = $('<img>').attr('src', data);
+                        $('#qr_code').html(qr_image);
+                    }
+                });
+            } else {
+                // Generar código QR con el id de la materia seleccionada
+                $.ajax({
+                    type: 'GET',
+                    url: 'generate_qr.php',
+                    data: { materia_id: materiaSeleccionada },
+                    success: function(data){
+                        var qr_image = $('<img>').attr('src', data);
+                        $('#qr_code').html(qr_image);
+                    }
+                });
+            }
+        });
+
+          
       });
   </script>
 
