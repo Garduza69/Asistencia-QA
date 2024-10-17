@@ -57,10 +57,7 @@ if (isset($_GET['materia_id'])) {
     $stmt_insertmat->execute();
     $stmt_insertmat->close();
 
-} else {
-    // Manejar el error si no se proporciona un materia_id
-    exit("Error: No se proporcionó un materia_id.");
-}
+} 
 
 
 // Ruta y nombre del archivo generado

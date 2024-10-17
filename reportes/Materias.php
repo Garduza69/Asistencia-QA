@@ -1,6 +1,6 @@
 <?php
 session_start();
-require('conexion2.php');
+require('../conexion2.php');
 
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: index.php");
