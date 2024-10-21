@@ -145,6 +145,15 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
 
   </main>
 
+  <section id="pricing">
+      <div class="box">
+        <h3>¿Quieres consultar tu calificación?</h3>
+        <p>Oprime el siguiente botón para abrir un lector para escanear tu código QR</p>
+        <a href="lector-calificaciones.php" class="get-started-btn scrollto">Lector de calificaciones</a>
+      </div>
+
+  </section>
+
   <!--==========================
     Footer
   ============================-->
