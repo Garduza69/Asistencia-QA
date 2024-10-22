@@ -28,14 +28,39 @@ if ($stmt_usuario->num_rows > 0) {
         $stmt_profesor->bind_result($profesor_id);
         $stmt_profesor->fetch();
 
+        // Si se envía una solicitud AJAX para actualizar las materias según el grupo
+        if (isset($_POST['grupo']) && isset($_POST['ajax'])) {
+            $grupoSeleccionado = $_POST['grupo'];
+
+            // Consulta para obtener las materias según el grupo seleccionado
+            $sql_materias_grupo = "SELECT m.nombre AS nombre
+                                   FROM horarios h
+                                   JOIN materias m ON m.materia_id = h.materia_id
+                                   JOIN grupos g ON g.grupo_id = h.grupo_id
+                                   WHERE h.profesor_id = ? AND g.clave_grupo = ? AND g.vigenciaSem = 1
+                                   GROUP BY m.nombre";
+            $stmt_materias_grupo = $db->prepare($sql_materias_grupo);
+            $stmt_materias_grupo->bind_param("is", $profesor_id, $grupoSeleccionado);
+            $stmt_materias_grupo->execute();
+            $result_materias_grupo = $stmt_materias_grupo->get_result();
+
+            // Devolver las opciones de materias en formato HTML
+            $options_materias = '';
+            while ($row = $result_materias_grupo->fetch_assoc()) {
+                $options_materias .= '<option value="' . $row['nombre'] . '">' . $row['nombre'] . '</option>';
+            }
+            echo $options_materias;
+            exit; // Terminar aquí para no continuar con el resto de la página
+        }
+
         // Consultar las materias que imparte el profesor en la tabla horarios
         $options_materias = '';
-		$options_grupos = '';
+        $options_grupos = '';
         $sql_materias = "SELECT m.nombre AS nombre, g.clave_grupo AS Grupos 
                 FROM horarios h 
                 JOIN materias m ON m.materia_id = h.materia_id
                 JOIN grupos g ON g.grupo_id = h.grupo_id
-                WHERE h.profesor_id = ? and g.vigenciaSem = 1
+                WHERE h.profesor_id = ? AND g.vigenciaSem = 1
                 GROUP BY m.nombre, g.clave_grupo;";
         $stmt_materias = $db->prepare($sql_materias);
         $stmt_materias->bind_param("i", $profesor_id);
@@ -43,15 +68,11 @@ if ($stmt_usuario->num_rows > 0) {
         $result_materias = $stmt_materias->get_result();
         
         while ($row = $result_materias->fetch_assoc()) {
-			$options_grupos .= '<option value="' . $row['Grupos'] . '">' . $row['Grupos'] . '</option>';
+            $options_grupos .= '<option value="' . $row['Grupos'] . '">' . $row['Grupos'] . '</option>';
             $options_materias .= '<option value="' . $row['nombre'] . '">' . $row['nombre'] . '</option>';
-
         }
     }
 }
-
-// Verificar si se ha enviado el formulario
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Recuperar los valores seleccionados
     $selected_materia = isset($_POST['materia']) ? $_POST['materia'] : '';
@@ -123,7 +144,7 @@ $facultad = $db->query($fac);
         }
 
         .container {
-            max-width: 1300px;
+            max-width: 1500px;
             margin: 50px auto;
             padding: 20px;
             background-color: #fff;
@@ -156,18 +177,37 @@ $facultad = $db->query($fac);
         .grades-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
         .grades-table th, .grades-table td {
-            border: 3px solid #ccc;
-            padding: 10px;
+            border: 5px solid #ccc;
+            padding: 5px;
             text-align: left;
         }
 
-        .grades-table th {
-            background-color: #f4f4f4;
-        }
+
+		.grades-table th:nth-child(1), .grades-table td:nth-child(1) {
+    		width: 2%;
+		}
+
+		.grades-table th:nth-child(2), .grades-table td:nth-child(2) {
+   			 width: 6%; 
+		}
+
+		.grades-table th:nth-child(3), .grades-table td:nth-child(3) {
+   		 width: 20%; 
+		}
+	
+		.grades-table th:nth-child(4), .grades-table td:nth-child(4),
+		.grades-table th:nth-child(5), .grades-table td:nth-child(5),
+		.grades-table th:nth-child(6), .grades-table td:nth-child(6) {
+  		  width: 5%; /* Ancho para las columnas de parciales */
+		}
+
+		.grades-table th {
+  		  background-color: #f4f4f4;
+		}
 
         button {
             display: block;
@@ -185,6 +225,37 @@ $facultad = $db->query($fac);
             background-color: #0056b3;
         }
     </style>
+    <script>
+    // Función para cargar materias basadas en el grupo seleccionado
+    function cargarMaterias() {
+        var grupoSelect = document.getElementById('grupos');
+        var materiaSelect = document.getElementById('materia');
+        var grupoSeleccionado = grupoSelect.value;
+		
+		materiaSelect.disabled = true;
+        materiaSelect.innerHTML = '<option value="">Cargando materias...</option>';
+
+        // Crear un objeto XMLHttpRequest
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        // Definir qué hacer cuando la solicitud sea exitosa
+        xhr.onload = function() {
+            if (this.status === 200) {
+                // Actualizar las opciones del combo de materias con la respuesta del servidor
+                materiaSelect.innerHTML = this.responseText;
+				materiaSelect.disabled = false;
+            } else {
+                // Si hay un error, mostrar un mensaje
+                materiaSelect.innerHTML = '<option value="">Error al cargar materias</option>';
+            }
+        };
+
+        // Enviar la solicitud con el grupo seleccionado y un indicador AJAX
+        xhr.send("grupo=" + grupoSeleccionado + "&ajax=true");
+    }
+    </script>
 </head>
 
 <body>
@@ -196,42 +267,39 @@ $facultad = $db->query($fac);
                 <label for="facultad">Facultad:</label>
                 <select name="facultad" id="facultad">
                 <?php
-                // Verificar si se obtuvieron resultados de la consulta
                 if ($facultad->num_rows > 0) {
-                    // Iterar sobre los resultados y generar las opciones del combo box
                     while ($row = $facultad->fetch_assoc()) {
                         echo '<option value="' . htmlspecialchars($row["nombre"]) . '">' . htmlspecialchars($row["nombre"]) . '</option>';
                     }
                 } else {
                     echo '<option value="">No hay facultades disponibles</option>';
                 }
-
-                // Cerrar la consulta
                 $facultad->close();
                 ?>
+                </select>
+            </div>
+
+            <!-- Sección de Grupo -->
+            <div class="section">
+                <label for="grupos">Grupo:</label>
+                <select name="grupos" id="grupos" onchange="cargarMaterias()">
+					<option value="">Seleccione un grupo</option>
+                <?php echo $options_grupos; ?>
                 </select>
             </div>
             
             <!-- Sección de Materia -->
             <div class="section">
                 <label for="materia">Materia:</label>
-                <select name="materia" id="materia">
+                <select name="materia" id="materia" disabled required>
+					<option value="">Seleccione una materia</option>
                 <?php echo $options_materias; ?>
-                </select>
-            </div>
-            
-            <!-- Sección de Grupo -->
-            <div class="section">
-                <label for="grupos">Grupo:</label>
-                <select name="grupos" id="grupos">				
-                <?php echo $options_grupos; ?>
                 </select>
             </div>
             
             <button type="submit" name="buscar">Buscar</button>
         </form>
 
-        <!-- Tabla de calificaciones -->
         <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
             if (count($calificaciones) > 0): ?>
@@ -252,12 +320,8 @@ $facultad = $db->query($fac);
                         </thead>
                         <tbody>
                             <?php 
-                            // Crear un array para almacenar los valores del ciclo
                             $valoresCiclo = [];
-
-                            // Recorrer los registros y construir la tabla
                             for ($i = 0; $i < count($calificaciones); $i++): 
-                                // Almacenar los valores de interés en el array
                                 $valoresCiclo[] = [
                                     'indice' => $i + 1,
                                     'matricula' => $calificaciones[$i]['matricula'],
@@ -291,18 +355,13 @@ $facultad = $db->query($fac);
         }
 
         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['registrar'])) {
-            // Recuperar los valores de la tabla
             $valoresCiclo = json_decode($_POST['valores_ciclo'], true);
-            
-            // Preparar la consulta SQL para insertar los registros
             $sql = "INSERT INTO calificaciones 
                     (profesor_id, alumno_id, materia_id, parcial_1, parcial_2, parcial_3, ordinario_1, ordinario_2, promedio, usuario_alta, usuario_actualizacion) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";        
             $stmt = $db->prepare($sql);
 
             foreach ($valoresCiclo as $valor) {
-                // Obtener los valores de la tabla
                 $profesor_id = $valor['nombre_docente']; // Ajustar según el ID real del profesor
                 $alumno_id = $valor['alumno_id'];
                 $materia_id = $valor['materia_id'];
@@ -319,11 +378,12 @@ $facultad = $db->query($fac);
                 $stmt->bind_param("iiidddddsss", $profesor_id, $alumno_id, $materia_id, $parcial_1, $parcial_2, $parcial_3, $ordinario_1, $ordinario_2, $promedio, $usuario_alta, $usuario_actualizacion);
 
                 // Ejecución de la consulta
-                if ($stmt->execute()) {
-                    echo "Registro insertado correctamente para el alumno ID: $alumno_id, Materia ID: $materia_id <br>";
-                } else {
-                    echo "Error al insertar el registro: " . $stmt->error . "<br>";
-                }
+
+            }
+			if ($stmt->execute()) {
+            echo "Calificacion Guardada Correctamente";
+            } else {
+             echo "Error al Subir las Calificaciones, Verifique Nuevamente". "<br>";
             }
 
             // Cerrar la sentencia después de que se haya usado
