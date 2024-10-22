@@ -377,15 +377,15 @@ $facultad = $db->query($fac);
                 // Asignación de los valores a los parámetros
                 $stmt->bind_param("iiidddddsss", $profesor_id, $alumno_id, $materia_id, $parcial_1, $parcial_2, $parcial_3, $ordinario_1, $ordinario_2, $promedio, $usuario_alta, $usuario_actualizacion);
 
+				
                 // Ejecución de la consulta
-
+                if ($stmt->execute()) {
+                    
+                } else {
+                    echo "Error al insertar el registro: " . $stmt->error . "<br>";
+                }
             }
-			if ($stmt->execute()) {
-            echo "Calificacion Guardada Correctamente";
-            } else {
-             echo "Error al Subir las Calificaciones, Verifique Nuevamente". "<br>";
-            }
-
+			echo "Calificación Guardada Correctamente ";
             // Cerrar la sentencia después de que se haya usado
             $stmt->close();
         }
