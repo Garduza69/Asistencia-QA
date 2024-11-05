@@ -255,6 +255,57 @@ $facultad = $db->query($fac);
         // Enviar la solicitud con el grupo seleccionado y un indicador AJAX
         xhr.send("grupo=" + grupoSeleccionado + "&ajax=true");
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+    const inputs = Array.from(document.querySelectorAll('tbody input[type="text"]'));
+
+        // Calcula el número de columnas de forma dinámica basado en la primera fila
+        const firstRowInputs = document.querySelectorAll('tbody tr:first-child input[type="text"]');
+        const columns = firstRowInputs.length;
+
+        document.addEventListener('keydown', function(e) {
+            const focused = document.activeElement;
+
+            // Verifica si el elemento enfocado es un input y si es editable
+            if (focused.tagName.toLowerCase() === 'input' && focused.type === 'text') {
+                const index = inputs.indexOf(focused);
+                let newIndex = index;
+
+                // Obtiene la posición del cursor en el campo actual
+                const cursorPos = focused.selectionStart;
+                const valueLength = focused.value.length;
+
+                switch (e.key) {
+                    case 'ArrowUp':
+                        // Solo cambia de celda si no se está editando en una posición específica
+                        newIndex = index - columns >= 0 ? index - columns : index;
+                        break;
+                    case 'ArrowDown':
+                        newIndex = index + columns < inputs.length ? index + columns : index;
+                        break;
+                    case 'ArrowLeft':
+                        // Permite moverse entre caracteres si no está al inicio del campo
+                        if (cursorPos === 0) {
+                            newIndex = index - 1 >= 0 ? index - 1 : index;
+                        }
+                        break;
+                    case 'ArrowRight':
+                        // Permite moverse entre caracteres si no está al final del campo
+                        if (cursorPos === valueLength) {
+                            newIndex = index + 1 < inputs.length ? index + 1 : index;
+                        }
+                        break;
+                    default:
+                        return; // Ignora si no es una tecla de flecha
+                }
+
+                if (newIndex !== index) {
+                    e.preventDefault(); // Evita el movimiento de cursor dentro del campo
+                    inputs[newIndex].focus(); // Mueve el foco a la nueva posición de celda
+                }
+            }
+        });
+    });
     </script>
 </head>
 
@@ -336,12 +387,12 @@ $facultad = $db->query($fac);
                                     <td><?php echo $i + 1; ?></td>
                                     <td><?php echo htmlspecialchars($calificaciones[$i]['matricula']); ?></td>
                                     <td><?php echo htmlspecialchars($calificaciones[$i]['nombre_completo']); ?></td>
-                                    <td><input type="text" name="parcial_1_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" value="0" /></td>
-                                    <td><input type="text" name="parcial_2_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" value="0" /></td>
-                                    <td><input type="text" name="parcial_3_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" value="0" /></td>
-                                    <td><input type="text" name="promedio_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" value="0" readonly /></td>
-                                    <td><input type="text" name="ordinario_1_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" value="0" /></td>
-                                    <td><input type="text" name="ordinario_2_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" value="0" /></td>
+                                    <td><input type="text" name="parcial_1_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" tabindex="1" value="0" /></td>
+                                    <td><input type="text" name="parcial_2_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" tabindex="1" value="0" /></td>
+                                    <td><input type="text" name="parcial_3_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" tabindex="1" value="0" /></td>
+                                    <td><input type="text" name="promedio_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" tabindex="1" value="0" readonly /></td>
+                                    <td><input type="text" name="ordinario_1_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" tabindex="1" value="0" /></td>
+                                    <td><input type="text" name="ordinario_2_<?php echo htmlspecialchars($calificaciones[$i]['alumno_id']); ?>" tabindex="1" value="0" /></td>
                                 </tr>
                             <?php endfor; ?>
                         </tbody>
