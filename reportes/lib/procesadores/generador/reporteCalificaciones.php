@@ -39,6 +39,11 @@ $alumno_id = $_GET['alumno_id'];
         $queryEncabezado = "SELECT  
                             al.matricula,
                             CONCAT(al.nombre, ' ', al.primer_apellido, ' ', al.segundo_apellido) AS Nombre_Alumno,
+                            al.sr AS nombre,
+                            al.domicilio AS domicilio,
+                            al.colonia AS colonia,
+                            al.codigo_postal AS codigo_postal,               
+                            al.ciudad AS ciudad,
                             f.nombre AS Facultad,
                             gr.clave_grupo AS Grupo,
                             s.Turno AS Turno,
@@ -76,9 +81,6 @@ $alumno_id = $_GET['alumno_id'];
                 $pdf->Text(15, 30, utf8_decode('BOLETA TEMPORAL.'));
                 $pdf->Ln(25);
 				
-                $pdf->SetFont('Courier', '', 10);
-                $pdf->Text(8, 140, utf8_decode('www.universidadsotavento.com'));
-                $pdf->Ln(25);
 
                 $pdf->SetFillColor(255, 255, 255);
                 $pdf->SetTextColor(0, 0, 0);
@@ -87,12 +89,12 @@ $alumno_id = $_GET['alumno_id'];
                 $pdf->Text(20, 38, utf8_decode('Destinatario.'));
 
                 $pdf->SetXY(20, 40);
-                $pdf->Cell(108, 25, utf8_decode(''), 1, 0, 'L', 1);
+                $pdf->Cell(115, 25, utf8_decode(''), 1, 0, 'L', 1);
                 $pdf->SetFont('Courier', '', 9);
-                $pdf->Text(21, 46, utf8_decode('Sr.'));
-                $pdf->Text(21, 51, utf8_decode('Domicilio:'));
-                $pdf->Text(21, 56, utf8_decode('Colonia:'));
-                $pdf->Text(21, 61, utf8_decode('Ciudad:             Codigo Postal:'));
+                $pdf->Text(21, 46, utf8_decode('Sr.									' . $fila['nombre']));
+                $pdf->Text(21, 51, utf8_decode('Domicilio:		' . $fila['domicilio']));
+                $pdf->Text(21, 56, utf8_decode('Colonia:				'. $fila['colonia']));
+                $pdf->Text(21, 61, utf8_decode('Ciudad: 				'  . $fila['ciudad'].' 		Codigo Postal:	'  . $fila['codigo_postal']));
                 $pdf->Text(21, 69, utf8_decode('Alumno:       ' . $fila['Nombre_Alumno']));
                 $pdf->Text(111, 69, utf8_decode('Sem: ' . $fila['Semestre']));
                 $pdf->Ln(50);
@@ -166,6 +168,9 @@ $alumno_id = $_GET['alumno_id'];
 			$pdf->Cell(10, 5, utf8_decode(' '), 1, 0, 'C', false);
             $pdf->Ln();       
         }
+				// Agregar texto en la parte inferior del PDF
+				$pdf->SetFont('Courier', '', 10);
+				$pdf->Text(8, 150, utf8_decode('www.universidadsotavento.com'));
                 $pdf->Ln(1);
                 $pdf->SetXY(15, 250);
                 $pdf->SetFont('Arial', 'B', 20);
