@@ -80,7 +80,7 @@ $alumno_id = $_GET['alumno_id'];
                 $pdf->SetFont('Courier', '', 10);
                 $pdf->Text(15, 30, utf8_decode('BOLETA TEMPORAL.'));
                 $pdf->Ln(25);
-				
+
 
                 $pdf->SetFillColor(255, 255, 255);
                 $pdf->SetTextColor(0, 0, 0);
@@ -137,7 +137,15 @@ $alumno_id = $_GET['alumno_id'];
 				$pdf->Ln(8); 
 
 				
-				$consultaAlumnos = $db->query("SELECT
+				$consultaMaterias = $db->query("SELECT
+									mat.nombre AS Materias
+									FROM matricula ma
+										JOIN alumnos al ON ma.alumno_id = al.alumno_id
+										JOIN materias mat ON ma.materia_id = mat.materia_id
+										JOIN grupos grup ON ma.grupo_id = grup.grupo_id
+									WHERE al.alumno_id = ".$alumno_id." AND grup.vigenciaSem = 1;");
+				
+				$consultaCalificaciones = $db->query("SELECT
 							mat.nombre AS Materias,
 							CAL.parcial_1 AS Cal1,
 							CAL.parcial_2 AS Cal2,
@@ -148,29 +156,55 @@ $alumno_id = $_GET['alumno_id'];
 								JOIN materias mat ON CAL.materia_id = mat.materia_id
 								WHERE al.alumno_id = ".$alumno_id.";");
 
-        $contador = 1;
-		while ($alu = $consultaAlumnos->fetch_assoc()) {
-            
-            $pdf->SetFont('Arial', '', 9);
-			$pdf->SetX(5);
-			$pdf->Cell(10, 5, $contador++ .". ", 1, 0, 'C');
-            $pdf->Cell(72, 5, utf8_decode($alu['Materias']), 1, 0, 'L');
-			$pdf->Cell(9, 5, utf8_decode($alu['Cal1']), 1, 0, 'C', false);
-			$pdf->Cell(9, 5, utf8_decode($alu['Cal2']), 1, 0, 'C', false);
-			$pdf->Cell(9, 5, utf8_decode($alu['Cal3']), 1, 0, 'C', false);
-			$pdf->Cell(12, 5, utf8_decode($alu['PROM']), 1, 0, 'C', false);
-            $pdf->Cell(13, 5, utf8_decode(' '), 1, 0, 'C', false);
-            $pdf->Cell(8, 5, utf8_decode(' '), 1, 0, 'C', false);
-			$pdf->Cell(9.5, 5, utf8_decode(' '), 1, 0, 'C', false);
-			$pdf->Cell(10.5, 5, utf8_decode(' '), 1, 0, 'C', false);
-			$pdf->Cell(11, 5, utf8_decode(' '), 1, 0, 'C', false);
-			$pdf->Cell(19, 5, utf8_decode(' '), 1, 0, 'C', false);
-			$pdf->Cell(10, 5, utf8_decode(' '), 1, 0, 'C', false);
-            $pdf->Ln();       
-        }
-				// Agregar texto en la parte inferior del PDF
-				$pdf->SetFont('Courier', '', 10);
-				$pdf->Text(8, 150, utf8_decode('www.universidadsotavento.com'));
+        
+				// Almacenar las calificaciones en un arreglo asociativo
+				$calificaciones = [];
+				while ($cal = $consultaCalificaciones->fetch_assoc()) {
+    				$calificaciones[$cal['Materias']] = [
+        			'Cal1' => $cal['Cal1'],
+        			'Cal2' => $cal['Cal2'],
+        			'Cal3' => $cal['Cal3'],
+        			'PROM' => $cal['PROM']
+					];
+				}
+// Generar el PDF con las materias y sus calificaciones correspondientes
+$contador = 1;
+while ($alu = $consultaMaterias->fetch_assoc()) {
+    $materia = $alu['Materias'];
+    $pdf->SetFont('Arial', '', 9);
+    $pdf->SetX(5);
+    $pdf->Cell(10, 5, $contador++ . ". ", 1, 0, 'C');  // Número de la materia
+    $pdf->Cell(72, 5, utf8_decode($materia), 1, 0, 'L');  // Nombre de la materia
+
+    // Obtener las calificaciones de la materia, si existen
+    $cal1 = $calificaciones[$materia]['Cal1'] ?? '';
+    $cal2 = $calificaciones[$materia]['Cal2'] ?? '';
+    $cal3 = $calificaciones[$materia]['Cal3'] ?? '';
+    $prom = $calificaciones[$materia]['PROM'] ?? '';
+
+    // Mostrar las calificaciones en las celdas correspondientes
+    $pdf->Cell(9, 5, utf8_decode($cal1), 1, 0, 'C', false);  // Calificación parcial 1
+    $pdf->Cell(9, 5, utf8_decode($cal2), 1, 0, 'C', false);  // Calificación parcial 2
+    $pdf->Cell(9, 5, utf8_decode($cal3), 1, 0, 'C', false);  // Calificación parcial 3
+    $pdf->Cell(12, 5, utf8_decode($prom), 1, 0, 'C', false); // Promedio
+
+    // Celdas vacías adicionales
+    $pdf->Cell(13, 5, '', 1, 0, 'C', false);
+    $pdf->Cell(8, 5, '', 1, 0, 'C', false);
+    $pdf->Cell(9.5, 5, '', 1, 0, 'C', false);
+    $pdf->Cell(10.5, 5, '', 1, 0, 'C', false);
+    $pdf->Cell(11, 5, '', 1, 0, 'C', false);
+    $pdf->Cell(19, 5, '', 1, 0, 'C', false);
+    $pdf->Cell(10, 5, '', 1, 0, 'C', false);
+
+    $pdf->Ln();  // Nueva línea para la siguiente materia
+}
+
+// Agregar texto en la parte inferior del PDF
+$pdf->SetFont('Courier', '', 10);
+$pdf->Text(8, 150, utf8_decode('www.universidadsotavento.com'));
+											
+
                 $pdf->Ln(1);
                 $pdf->SetXY(15, 250);
                 $pdf->SetFont('Arial', 'B', 20);
