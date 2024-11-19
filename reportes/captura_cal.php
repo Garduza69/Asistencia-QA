@@ -361,8 +361,8 @@ $facultad = $db->query($fac);
                     <option value="parcial1"> Parcial 1</option>
                     <option value="parcial2"> Parcial 2</option>
                     <option value="parcial3"> Parcial 3</option>
-                    <option value="Ordinario"> Ordinario</option>
-                    <option value="Ordinario2"> Ordinario 2</option>
+                    <option value="ordinario1"> Ordinario</option>
+                    <option value="ordinario2"> Ordinario 2</option>
                
                 </select>
             </div>
@@ -374,6 +374,74 @@ $facultad = $db->query($fac);
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
     // Obtiene la opción seleccionada
     $parcialSeleccionado = isset($_POST['parcial']) ? $_POST['parcial'] : '';
+    $selected_materia = isset($_POST['materia']) ? $_POST['materia'] : '';
+    $selected_grupo = isset($_POST['grupos']) ? $_POST['grupos'] : '';
+
+    // Consulta SQL para recuperar las calificaciones de la base de datos
+    $sql_calificaciones = "
+        SELECT 
+            alu.alumno_id,
+            alu.matricula,
+            CONCAT(alu.primer_apellido, ' ', alu.segundo_apellido, ' ', alu.nombre) AS nombre_completo,
+            g.clave_grupo,
+            ma.nombre AS materia_nombre,
+            ma.materia_id,
+            h.profesor_id AS nombre_docente,
+            cal.parcial_1,
+            cal.parcial_2,
+            cal.parcial_3,
+            cal.ordinario_1,
+            cal.ordinario_2
+        FROM 
+            matricula mat
+        JOIN 
+            alumnos alu ON mat.alumno_id = alu.alumno_id
+        JOIN 
+            grupos g ON mat.grupo_id = g.grupo_id
+        JOIN 
+            materias ma ON mat.materia_id = ma.materia_id
+        JOIN 
+            horarios h ON h.materia_id = ma.materia_id AND h.grupo_id = g.grupo_id
+        LEFT JOIN 
+            calificaciones cal ON cal.alumno_id = alu.alumno_id AND cal.materia_id = ma.materia_id AND cal.profesor_id = h.profesor_id
+        WHERE 
+            ma.nombre = ? AND g.clave_grupo = ?
+        GROUP BY 
+            alu.alumno_id,
+            alu.matricula,
+            nombre_completo,
+            g.clave_grupo,
+            ma.materia_id,
+            cal.parcial_1,
+            cal.parcial_2,
+            cal.parcial_3,
+            cal.ordinario_1,
+            cal.ordinario_2
+    ";
+
+    $stmt_calificaciones = $db->prepare($sql_calificaciones);
+    $stmt_calificaciones->bind_param("ss", $selected_materia, $selected_grupo);
+    $stmt_calificaciones->execute();
+    $result_calificaciones = $stmt_calificaciones->get_result();
+
+    $calificaciones = [];
+    while ($row = $result_calificaciones->fetch_assoc()) {
+        $calificaciones[] = [
+            'alumno_id' => $row['alumno_id'],
+            'matricula' => $row['matricula'],
+            'nombre_completo' => $row['nombre_completo'],
+            'materia_nombre' => $row['materia_nombre'],
+            'materia_id' => $row['materia_id'],
+            'nombre_docente' => $row['nombre_docente'],
+            'parcial_1' => $row['parcial_1'],
+            'parcial_2' => $row['parcial_2'],
+            'parcial_3' => $row['parcial_3'],
+            'ordinario_1' => $row['ordinario_1'],
+            'ordinario_2' => $row['ordinario_2']
+        ];
+    }
+
+    $stmt_calificaciones->close();
 
     if (count($calificaciones) > 0 && !empty($parcialSeleccionado)): ?>
         <form method="post">
@@ -418,28 +486,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
                             'materia_id' => $calificaciones[$i]['materia_id'],
                             'nombre_docente' => $calificaciones[$i]['nombre_docente']
                         ];
+
+                        // Recuperar calificación específica del parcial seleccionado desde la base de datos
+                        $alumno_id = $calificaciones[$i]['alumno_id'];
+                        $calificacionParcial = 0; // Valor por defecto en caso de no encontrar nada
+
+                        // Determina cuál campo usar basado en el parcial seleccionado
+                        switch ($parcialSeleccionado) {
+                            case 'parcial1':
+                                $calificacionParcial = isset($calificaciones[$i]['parcial_1']) ? $calificaciones[$i]['parcial_1'] : 0;
+                                break;
+                            case 'parcial2':
+                                $calificacionParcial = isset($calificaciones[$i]['parcial_2']) ? $calificaciones[$i]['parcial_2'] : 0;
+                                break;
+                            case 'parcial3':
+                                $calificacionParcial = isset($calificaciones[$i]['parcial_3']) ? $calificaciones[$i]['parcial_3'] : 0;
+                                break;
+                            case 'ordinario1':
+                                $calificacionParcial = isset($calificaciones[$i]['ordinario_1']) ? $calificaciones[$i]['ordinario_1'] : 0;
+                                break;
+                            case 'ordinario2':
+                                $calificacionParcial = isset($calificaciones[$i]['ordinario_2']) ? $calificaciones[$i]['ordinario_2'] : 0;
+                                break;
+                        }
+
+                        $disabled = $calificacionParcial > 0 ? "disabled" : ""; // Desactiva si el valor es mayor a 0
                     ?>
                         <tr>
                             <td><?php echo $i + 1; ?></td>
                             <td><?php echo htmlspecialchars($calificaciones[$i]['matricula']); ?></td>
                             <td><?php echo htmlspecialchars($calificaciones[$i]['nombre_completo']); ?></td>
                             <?php
-                            // Mostrar solo la columna de calificación seleccionada
+                            // Mostrar solo la columna de calificación seleccionada con el valor recuperado
                             switch ($parcialSeleccionado) {
                                 case 'parcial1':
-                                    echo "<td><input type='text' name='parcial_1_{$calificaciones[$i]['alumno_id']}' value='0' tabindex='1' /></td>";
+                                    echo "<td><input type='text' name='parcial_1_{$alumno_id}' value='" . htmlspecialchars($calificacionParcial) . "' tabindex='1' $disabled /></td>";
                                     break;
                                 case 'parcial2':
-                                    echo "<td><input type='text' name='parcial_2_{$calificaciones[$i]['alumno_id']}' value='0' tabindex='1' /></td>";
+                                    echo "<td><input type='text' name='parcial_2_{$alumno_id}' value='" . htmlspecialchars($calificacionParcial) . "' tabindex='1' $disabled /></td>";
                                     break;
                                 case 'parcial3':
-                                    echo "<td><input type='text' name='parcial_3_{$calificaciones[$i]['alumno_id']}' value='0' tabindex='1' /></td>";
+                                    echo "<td><input type='text' name='parcial_3_{$alumno_id}' value='" . htmlspecialchars($calificacionParcial) . "' tabindex='1' $disabled /></td>";
                                     break;
                                 case 'ordinario1':
-                                    echo "<td><input type='text' name='ordinario_1_{$calificaciones[$i]['alumno_id']}' value='0' tabindex='1' /></td>";
+                                    echo "<td><input type='text' name='ordinario_1_{$alumno_id}' value='" . htmlspecialchars($calificacionParcial) . "' tabindex='1' $disabled /></td>";
                                     break;
                                 case 'ordinario2':
-                                    echo "<td><input type='text' name='ordinario_2_{$calificaciones[$i]['alumno_id']}' value='0' tabindex='1' /></td>";
+                                    echo "<td><input type='text' name='ordinario_2_{$alumno_id}' value='" . htmlspecialchars($calificacionParcial) . "' tabindex='1' $disabled /></td>";
                                     break;
                             }
                             ?>
@@ -455,40 +548,103 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
     <?php endif;
         }
 
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['registrar'])) {
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['registrar'])) { 
             $valoresCiclo = json_decode($_POST['valores_ciclo'], true);
-            $sql = "INSERT INTO calificaciones 
-                    (profesor_id, alumno_id, materia_id, parcial_1, parcial_2, parcial_3, ordinario_1, ordinario_2, promedio, usuario_alta, usuario_actualizacion) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";        
-            $stmt = $db->prepare($sql);
-
-            foreach ($valoresCiclo as $valor) {
-                $profesor_id = $valor['nombre_docente']; // Ajustar según el ID real del profesor
-                $alumno_id = $valor['alumno_id'];
-                $materia_id = $valor['materia_id'];
-                $parcial_1 = isset($_POST['parcial_1_' . $alumno_id]) ? floatval($_POST['parcial_1_' . $alumno_id]) : 0.00;
-                $parcial_2 = isset($_POST['parcial_2_' . $alumno_id]) ? floatval($_POST['parcial_2_' . $alumno_id]) : 0.00;
-                $parcial_3 = isset($_POST['parcial_3_' . $alumno_id]) ? floatval($_POST['parcial_3_' . $alumno_id]) : 0.00;
-                $ordinario_1 = isset($_POST['ordinario_1_' . $alumno_id]) ? floatval($_POST['ordinario_1_' . $alumno_id]) : 0.00;
-                $ordinario_2 = isset($_POST['ordinario_2_' . $alumno_id]) ? floatval($_POST['ordinario_2_' . $alumno_id]) : 0.00;
-                $promedio = ($parcial_1 + $parcial_2 + $parcial_3) / 3;
-                $usuario_alta = 'admin';
-                $usuario_actualizacion = 'admin';
-
-                // Asignación de los valores a los parámetros
-                $stmt->bind_param("iiidddddsss", $profesor_id, $alumno_id, $materia_id, $parcial_1, $parcial_2, $parcial_3, $ordinario_1, $ordinario_2, $promedio, $usuario_alta, $usuario_actualizacion);
-
-				
-                // Ejecución de la consulta
-                if ($stmt->execute()) {
-                    
+        
+            // Preparar la consulta para inserción
+            $sqlInsert = "INSERT INTO calificaciones 
+                          (profesor_id, alumno_id, materia_id, parcial_1, parcial_2, parcial_3, ordinario_1, ordinario_2, promedio, usuario_alta, usuario_actualizacion) 
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+            // Preparar la consulta para actualización
+            $sqlUpdate = "UPDATE calificaciones SET 
+                          parcial_1 = ?, parcial_2 = ?, parcial_3 = ?, ordinario_1 = ?, ordinario_2 = ?, promedio = ?, usuario_actualizacion = ? 
+                          WHERE profesor_id = ? AND alumno_id = ? AND materia_id = ?";
+        
+            // Consulta para verificar si existe el registro
+            $sqlCheck = "SELECT profesor_id FROM calificaciones WHERE profesor_id = ? AND alumno_id = ? AND materia_id = ?";
+            $stmtCheck = $db->prepare($sqlCheck);
+        
+            // Preparar las sentencias para insertar y actualizar
+            $stmtInsert = $db->prepare($sqlInsert);
+            $stmtUpdate = $db->prepare($sqlUpdate);
+        
+        foreach ($valoresCiclo as $valor) {
+            $profesor_id = $valor['nombre_docente']; // Ajustar según el ID real del profesor
+            $alumno_id = $valor['alumno_id'];
+            $materia_id = $valor['materia_id'];
+            $usuario_alta = 'admin';
+            $usuario_actualizacion = 'admin';
+        
+            // Inicializar variables para los parciales con los valores enviados en el formulario
+            $parcial_1 = isset($_POST['parcial_1_' . $alumno_id]) ? floatval($_POST['parcial_1_' . $alumno_id]) : null;
+            $parcial_2 = isset($_POST['parcial_2_' . $alumno_id]) ? floatval($_POST['parcial_2_' . $alumno_id]) : null;
+            $parcial_3 = isset($_POST['parcial_3_' . $alumno_id]) ? floatval($_POST['parcial_3_' . $alumno_id]) : null;
+            $ordinario_1 = isset($_POST['ordinario_1_' . $alumno_id]) ? floatval($_POST['ordinario_1_' . $alumno_id]) : null;
+            $ordinario_2 = isset($_POST['ordinario_2_' . $alumno_id]) ? floatval($_POST['ordinario_2_' . $alumno_id]) : null;
+        
+            // Recuperar los valores existentes antes de realizar la actualización
+            $stmtCheck->bind_param("iii", $profesor_id, $alumno_id, $materia_id);
+            $stmtCheck->execute();
+            $stmtCheck->store_result();
+        
+                if ($stmtCheck->num_rows > 0) {
+                    // Recupera las calificaciones existentes
+                    $sqlCheckcal = "SELECT parcial_1, parcial_2, parcial_3, ordinario_1, ordinario_2 FROM calificaciones WHERE profesor_id = ? AND alumno_id = ? AND materia_id = ?";
+                    $stmtCheckcal = $db->prepare($sqlCheckcal);
+                    $stmtCheckcal->bind_param("iii", $profesor_id, $alumno_id, $materia_id);
+                    $stmtCheckcal->execute();
+                    $stmtCheckcal->store_result();
+                    $stmtCheckcal->bind_result($current_parcial_1, $current_parcial_2, $current_parcial_3, $current_ordinario_1, $current_ordinario_2);
+                    $stmtCheckcal->fetch();
+        
+                    // Mantén las calificaciones actuales si no se han enviado en el formulario
+                    $parcial_1 = is_null($parcial_1) ? $current_parcial_1 : $parcial_1;
+                    $parcial_2 = is_null($parcial_2) ? $current_parcial_2 : $parcial_2;
+                    $parcial_3 = is_null($parcial_3) ? $current_parcial_3 : $parcial_3;
+                    $ordinario_1 = is_null($ordinario_1) ? $current_ordinario_1 : $ordinario_1;
+                    $ordinario_2 = is_null($ordinario_2) ? $current_ordinario_2 : $ordinario_2;
+        
+                    // Calcular el promedio actualizado
+                    $promedio = ($parcial_1 + $parcial_2 + $parcial_3) / 3;
+        
+                    // Actualizar el registro existente
+                    $stmtUpdate->bind_param("ddddddsiis", 
+                        $parcial_1, $parcial_2, $parcial_3, $ordinario_1, $ordinario_2, $promedio, 
+                        $usuario_actualizacion, $profesor_id, $alumno_id, $materia_id
+                    );
+                    if ($stmtUpdate->execute()) {
+                        echo "Registro actualizado correctamente.<br>";
+                    } else {
+                        echo "Error al actualizar el registro: " . $stmtUpdate->error . "<br>";
+                    }
                 } else {
-                    echo "Error al insertar el registro: " . $stmt->error . "<br>";
+                    // Si el registro no existe, insertar con los valores actuales
+                    $parcial_1 = is_null($parcial_1) ? 0 : $parcial_1;
+                    $parcial_2 = is_null($parcial_2) ? 0 : $parcial_2;
+                    $parcial_3 = is_null($parcial_3) ? 0 : $parcial_3;
+                    $ordinario_1 = is_null($ordinario_1) ? 0 : $ordinario_1;
+                    $ordinario_2 = is_null($ordinario_2) ? 0 : $ordinario_2;
+        
+                    $promedio = ($parcial_1 + $parcial_2 + $parcial_3) / 3;
+        
+                    // Inserción del registro
+                    $stmtInsert->bind_param("iiidddddsss", 
+                        $profesor_id, $alumno_id, $materia_id, $parcial_1, $parcial_2, $parcial_3, 
+                        $ordinario_1, $ordinario_2, $promedio, $usuario_alta, $usuario_actualizacion
+                    );
+                    if ($stmtInsert->execute()) {
+                        echo "Registro insertado correctamente.<br>";
+                    } else {
+                        echo "Error al insertar el registro: " . $stmtInsert->error . "<br>";
+                    }
                 }
-            }
-			echo "Calificación Guardada Correctamente ";
-            // Cerrar la sentencia después de que se haya usado
-            $stmt->close();
+        }
+        
+            // Cerrar las sentencias después de que se hayan usado
+            $stmtCheck->close();
+            $stmtInsert->close();
+            $stmtUpdate->close();
         }
         ?>
     </div>
