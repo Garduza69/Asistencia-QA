@@ -23,7 +23,7 @@ if (isset($_GET['token'])) {
         $row = $result->fetch_assoc();
         $correo_destinatario = $row['correo'];
 
-        // Ejemplo de envío de correo electrónico (reemplaza con tu código real)
+        // Ejemplo de envío de correo electrónico
         $mail = new PHPMailer(true);
         try {
             // Configuración del servidor SMTP (Gmail)
@@ -67,7 +67,49 @@ if (isset($_GET['token'])) {
 
     // Cierra la conexión a la base de datos
     $db->close();
-} else {
+} 
+
+//verifica si se recibió el email y parcial de la captura_cal
+if (isset($_GET['email']) && isset($_GET['parcial'])){
+    $correo_destinatario = $_GET['email'];
+    $parcial = $_GET['parcial'];
+    $materia = $_GET['materia'];
+    $facultad = $_GET['facultad'];
+
+    // Ejemplo de envío de correo electrónico
+    $mail = new PHPMailer(true);
+    try {
+        // Configuración del servidor SMTP (Gmail)
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'sistemasotaventous@gmail.com'; // Cambia esto por tu dirección de correo electrónico
+        $mail->Password = 'le a w w w o j o l i r q x j m'; // Cambia esto por tu contraseña de correo electrónico
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = 587;
+
+        // Configuración del correo
+        $mail->setFrom($correo_destinatario, 'SOTAVENTO');
+        $mail->addAddress($correo_destinatario);
+        $mail->isHTML(true);
+
+        $asunto = "Calificacion del " . $parcial . " recibida";
+        $cuerpo = "Se subieron correctamente las califiaciones del " . $parcial . " de la materia " . $materia . " de " . $facultad;
+
+        $mail->Subject = "$asunto";
+        $mail->Body = "$cuerpo";
+
+        // Envía el correo
+        $mail->send();
+        echo $cuerpo;
+        header("Location: reportes/captura_cal.php");
+
+    } catch (Exception $e) {
+        echo "Error al enviar el correo: {$mail->ErrorInfo}";
+    }
+
+
+}else {
     // Si el token o el resultado no se recibieron por GET, muestra un mensaje de error
     echo "Error: No se proporcionaron suficientes parámetros en la URL.";
 }

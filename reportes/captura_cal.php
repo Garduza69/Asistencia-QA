@@ -7,6 +7,9 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 }
 
 $email_usuario = $_SESSION['email'];
+global $parcialnot;
+global $select_fac;
+global $parcialSeleccionado;
 
 // Consultar el idUsuario asociado al correo del usuario actual
 $sql_usuario = "SELECT idUsuario FROM usuario WHERE Email = ?";
@@ -128,7 +131,6 @@ $fac = "SELECT nombre FROM facultades";
 $facultad = $db->query($fac);
 
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -228,6 +230,7 @@ $facultad = $db->query($fac);
             background-color: #0056b3;
         }
     </style>
+
 
 
     <script>
@@ -358,11 +361,11 @@ $facultad = $db->query($fac);
                 <label for="parcial">Parciales:</label>
                 <select name="parcial" id="parcial">
 					<option value="">Seleccione un parcial u ordinario</option>
-                    <option value="parcial1"> Parcial 1</option>
-                    <option value="parcial2"> Parcial 2</option>
-                    <option value="parcial3"> Parcial 3</option>
-                    <option value="ordinario1"> Ordinario</option>
-                    <option value="ordinario2"> Ordinario 2</option>
+                    <option value="parcial 1"> Parcial 1</option>
+                    <option value="parcial 2"> Parcial 2</option>
+                    <option value="parcial 3"> Parcial 3</option>
+                    <option value="ordinario 1"> Ordinario</option>
+                    <option value="ordinario 2"> Ordinario 2</option>
                
                 </select>
             </div>
@@ -376,6 +379,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
     $parcialSeleccionado = isset($_POST['parcial']) ? $_POST['parcial'] : '';
     $selected_materia = isset($_POST['materia']) ? $_POST['materia'] : '';
     $selected_grupo = isset($_POST['grupos']) ? $_POST['grupos'] : '';
+    $select_fac = isset( $_POST['facultad']) ? $_POST['facultad']:'';
+
+    $_SESSION['parcial'] = $_POST['parcial'];
+    $_SESSION['materia'] = $_POST['materia'];
+    $_SESSION['facultad'] = $_POST['facultad'];
 
     // Consulta SQL para recuperar las calificaciones de la base de datos
     $sql_calificaciones = "
@@ -454,19 +462,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
                         <?php
                         // Mostrar el encabezado solo para la columna seleccionada
                         switch ($parcialSeleccionado) {
-                            case 'parcial1':
+                            case 'parcial 1':
                                 echo "<th>Parcial 1</th>";
                                 break;
-                            case 'parcial2':
+                            case 'parcial 2':
                                 echo "<th>Parcial 2</th>";
                                 break;
-                            case 'parcial3':
+                            case 'parcial 3':
                                 echo "<th>Parcial 3</th>";
                                 break;
-                            case 'ordinario1':
+                            case 'ordinario 1':
                                 echo "<th>Ordinario</th>";
                                 break;
-                            case 'ordinario2':
+                            case 'ordinario 2':
                                 echo "<th>Ordinario 2</th>";
                                 break;
                         }
@@ -493,19 +501,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
 
                         // Determina cuál campo usar basado en el parcial seleccionado
                         switch ($parcialSeleccionado) {
-                            case 'parcial1':
+                            case 'parcial 1':
                                 $calificacionParcial = isset($calificaciones[$i]['parcial_1']) ? $calificaciones[$i]['parcial_1'] : 0;
                                 break;
-                            case 'parcial2':
+                            case 'parcial 2':
                                 $calificacionParcial = isset($calificaciones[$i]['parcial_2']) ? $calificaciones[$i]['parcial_2'] : 0;
                                 break;
-                            case 'parcial3':
+                            case 'parcial 3':
                                 $calificacionParcial = isset($calificaciones[$i]['parcial_3']) ? $calificaciones[$i]['parcial_3'] : 0;
                                 break;
-                            case 'ordinario1':
+                            case 'ordinario 1':
                                 $calificacionParcial = isset($calificaciones[$i]['ordinario_1']) ? $calificaciones[$i]['ordinario_1'] : 0;
                                 break;
-                            case 'ordinario2':
+                            case 'ordinario 2':
                                 $calificacionParcial = isset($calificaciones[$i]['ordinario_2']) ? $calificaciones[$i]['ordinario_2'] : 0;
                                 break;
                         }
@@ -519,20 +527,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
                             <?php
                             // Mostrar solo la columna de calificación seleccionada con el valor recuperado
                             switch ($parcialSeleccionado) {
-                                case 'parcial1':
+                                case 'parcial 1':
                                     echo "<td><input type='text' name='parcial_1_{$alumno_id}' value='" . htmlspecialchars($calificacionParcial) . "' tabindex='1' $disabled /></td>";
+                                    $parcialnot = "parcial 1";
                                     break;
-                                case 'parcial2':
+                                case 'parcial 2':
                                     echo "<td><input type='text' name='parcial_2_{$alumno_id}' value='" . htmlspecialchars($calificacionParcial) . "' tabindex='1' $disabled /></td>";
+                                    $parcialnot = "parcial 2";
                                     break;
-                                case 'parcial3':
+                                case 'parcial 3':
                                     echo "<td><input type='text' name='parcial_3_{$alumno_id}' value='" . htmlspecialchars($calificacionParcial) . "' tabindex='1' $disabled /></td>";
+                                    $parcialnot = "parcial 3";
                                     break;
-                                case 'ordinario1':
+                                case 'ordinario 1':
                                     echo "<td><input type='text' name='ordinario_1_{$alumno_id}' value='" . htmlspecialchars($calificacionParcial) . "' tabindex='1' $disabled /></td>";
+                                    $parcialnot = "ordinario 1";
                                     break;
-                                case 'ordinario2':
+                                case 'ordinario 2':
                                     echo "<td><input type='text' name='ordinario_2_{$alumno_id}' value='" . htmlspecialchars($calificacionParcial) . "' tabindex='1' $disabled /></td>";
+                                    $parcialnot = "ordinario 2";
                                     break;
                             }
                             ?>
@@ -547,6 +560,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
         <p>No hay datos disponibles para la selección actual.</p>
     <?php endif;
         }
+
+        // Recuperar los valores de la sesión
+        $parcialSeleccionado = isset($_SESSION['parcial']) ? $_SESSION['parcial'] : '';
+        $selected_materia = isset($_SESSION['materia']) ? $_SESSION['materia'] : '';
+        $select_fac = isset($_SESSION['facultad']) ? $_SESSION['facultad'] : '';
 
         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['registrar'])) { 
             $valoresCiclo = json_decode($_POST['valores_ciclo'], true);
@@ -615,6 +633,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
                     );
                     if ($stmtUpdate->execute()) {
                         echo "Registro actualizado correctamente.<br>";
+                        ?>
+                        <form id="redirectForm" action="../send_email.php" method="get">
+                        <input type="hidden" name="email" value="<?php echo htmlspecialchars($email_usuario); ?>">
+                        <input type="hidden" name="parcial" value="<?php echo htmlspecialchars($parcialSeleccionado); ?>">
+                        <input type="hidden" name="materia" value="<?php echo htmlspecialchars($selected_materia); ?>">
+                        <input type="hidden" name="facultad" value="<?php echo htmlspecialchars($select_fac); ?>">
+                        </form>
+                        <script>
+                        document.getElementById('redirectForm').submit();
+                        </script>
+                        <?php
+                        unset($_SESSION['parcial']);
+                        unset($_SESSION['materia']);
+                        unset($_SESSION['facultad']);
                     } else {
                         echo "Error al actualizar el registro: " . $stmtUpdate->error . "<br>";
                     }
@@ -634,7 +666,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
                         $ordinario_1, $ordinario_2, $promedio, $usuario_alta, $usuario_actualizacion
                     );
                     if ($stmtInsert->execute()) {
-                        echo "Registro insertado correctamente.<br>";
+                        echo "Registro actualizado correctamente.<br>";
+                        ?>
+                        <form id="redirectForm" action="../send_email.php" method="get">
+                        <input type="hidden" name="email" value="<?php echo htmlspecialchars($email_usuario); ?>">
+                        <input type="hidden" name="parcial" value="<?php echo htmlspecialchars($parcialSeleccionado); ?>">
+                        <input type="hidden" name="materia" value="<?php echo htmlspecialchars($selected_materia); ?>">
+                        <input type="hidden" name="facultad" value="<?php echo htmlspecialchars($select_fac); ?>">
+                        </form>
+                        <script>
+                        document.getElementById('redirectForm').submit();
+                        </script>
+                        <?php
+                        unset($_SESSION['parcial']);
+                        unset($_SESSION['materia']);
+                        unset($_SESSION['facultad']);
                     } else {
                         echo "Error al insertar el registro: " . $stmtInsert->error . "<br>";
                     }
