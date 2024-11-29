@@ -5,36 +5,21 @@ require('./fpdf.php');
 require('../../../../conexion2.php');
 
 class PDFWithFooter extends FPDF {
-    // Pie de página
     function Footer() {
-        // Posición a 1,5 cm desde abajo
         $this->SetY(-13);
-        // Arial italic 8
         $this->SetFont('Arial','I',8);
-        
-        // Establecer la zona horaria a México
         date_default_timezone_set('America/Mexico_City');
-        
-        // Obtener la fecha de hoy en formato dd/mm/aaaa
         $fecha_actual = date('d/m/Y');
-        
-        // Obtener la hora actual en formato 00:00:00 PM/AM
         $hora_actual = date('h:i:s A');
-        
-        // Agregar la fecha actual al pie de página
         $this->Cell(0, 15, utf8_decode($fecha_actual.'  '.$hora_actual), 0, 0, 'L');
-        $this->Cell(-198, 15, utf8_decode('Martires de Chicago No 205. Col. Tesoro' . '    (921) 218 - 2311 / 218 - 2312 / 218 - 9180'), 0, 0, 'C');    
-        
+        $this->Cell(-198, 15, utf8_decode('Martires de Chicago No 205. Col. Tesoro' . '    (921) 218 - 2311 / 218 - 2312 / 218 - 9180'), 0, 0, 'C');           
         $this->Cell(182, 15, utf8_decode('Coatzacoalcos, Ver.'), 0, 0, 'R');
-		$this->Cell(0, 15, utf8_decode('Página ') . $this->PageNo(), 0, 0, 'R');
-        
+		$this->Cell(0, 15, utf8_decode('Página ') . $this->PageNo(), 0, 0, 'R');       
     }
 }
-
 $pdf = new PDFWithFooter();
 $facultad = $_GET['facultad'];
 $grupo = $_GET['grupo'];
-
         $queryEncabezado = $db->query("SELECT  
     							al.matricula AS matriculas,
     							CONCAT(al.nombre, ' ', al.primer_apellido, ' ', al.segundo_apellido) AS Nombre_Alumno,
@@ -43,10 +28,12 @@ $grupo = $_GET['grupo'];
 								al.colonia AS colonia,
    								al.codigo_postal AS codigo_postal,               
    								al.ciudad AS ciudad,
+								al.alumno_id  AS alumno_id,
    								f.nombre AS Facultad,
     								gr.clave_grupo AS Grupo,
     								s.Turno AS Turno,
-   								 	s.nombre AS Semestre
+   								 	s.nombre AS Semestre,
+									s.Periodo AS Periodo
 								FROM matricula mat
 									JOIN alumnos al ON mat.alumno_id = al.alumno_id
 										JOIN grupos gr ON mat.grupo_id = gr.grupo_id
@@ -57,9 +44,7 @@ $grupo = $_GET['grupo'];
    										AND gr.clave_grupo = '".$grupo."'
   										AND gr.vigenciaSem = 1
 									GROUP BY
-    								al.matricula;");
-
-		
+    								al.matricula;");		
         if($queryEncabezado->num_rows > 0){
             while ($fila = $queryEncabezado->fetch_assoc()) {    
                 $pdf->AddPage();
@@ -105,13 +90,13 @@ $grupo = $_GET['grupo'];
 
                 $pdf->Ln(50);
                 $pdf->SetXY(120, 78);
-                $pdf->Cell(75, 21, utf8_decode(''), 1, 0, 'L', 1);
-                $pdf->SetFont('Courier', 'B', 10);
-                $pdf->Text(125,85, utf8_decode($fila['Nombre_Alumno']));
+                $pdf->Cell(80, 21, utf8_decode(''), 1, 0, 'L', 1);
+                $pdf->SetFont('Courier', 'BI', 11);
+                $pdf->Text(123,85, utf8_decode($fila['Nombre_Alumno']));
                 $pdf->SetFont('Courier', 'B', 9);
-                $pdf->Text(170,97, utf8_decode($fila['matriculas']));
+                $pdf->Text(182,97, utf8_decode($fila['matriculas']));
 				
-				$pdf->Ln(25); // Salto de línea
+				$pdf->Ln(25);
 				$pdf->SetXY(5, 103);
 				
 				$pdf->SetFont('Arial', 'B', 9);
@@ -132,19 +117,81 @@ $grupo = $_GET['grupo'];
 				$pdf->Text(127, 106, utf8_decode('Examen'));
 				$pdf->Text(127, 109, utf8_decode('Ordinario'));
 				$pdf->Ln(8); 
+				
+				$alumno_id = $fila['alumno_id'];
+				$consultaMaterias = $db->query("
+				SELECT mat.nombre AS Materias
+					FROM matricula ma
+    				JOIN alumnos al ON ma.alumno_id = al.alumno_id
+    				JOIN materias mat ON ma.materia_id = mat.materia_id
+					JOIN grupos grup ON ma.grupo_id = grup.grupo_id
+					WHERE al.alumno_id = $alumno_id AND grup.vigenciaSem = 1;
+				");
+				
+				$consultaCalificaciones = $db->query("SELECT
+							mat.nombre AS Materias,
+							CAL.parcial_1 AS Cal1,
+							CAL.parcial_2 AS Cal2,
+    						CAL.parcial_3 AS Cal3,
+    						CAL.promedio AS PROM
+								FROM calificaciones CAL
+								JOIN alumnos al ON CAL.alumno_id = al.alumno_id
+								JOIN materias mat ON CAL.materia_id = mat.materia_id
+								WHERE al.alumno_id = ".$alumno_id.";");
+				$calificaciones = [];
+				while ($cal = $consultaCalificaciones->fetch_assoc()) {
+    				$calificaciones[$cal['Materias']] = [
+        			'Cal1' => $cal['Cal1'],
+        			'Cal2' => $cal['Cal2'],
+        			'Cal3' => $cal['Cal3'],
+        			'PROM' => $cal['PROM']
+					];
+				}
+				$contador = 1;
+				while ($alu = $consultaMaterias->fetch_assoc()) {
+					$materia = $alu['Materias'];
+    				$pdf->SetFont('Arial', '', 9);
+    				$pdf->SetX(5);
+    				$pdf->Cell(10, 5, $contador++ . ". ", 1, 0, 'C');
+    				$pdf->Cell(72, 5, utf8_decode($materia), 1, 0, 'L'); 
+    				$cal1 = $calificaciones[$materia]['Cal1'] ?? '';
+    				$cal2 = $calificaciones[$materia]['Cal2'] ?? '';
+    				$cal3 = $calificaciones[$materia]['Cal3'] ?? '';
+    				$prom = $calificaciones[$materia]['PROM'] ?? '';
+					
+   				 	$pdf->Cell(9, 5, utf8_decode($cal1), 1, 0, 'C', false); 
+					$pdf->Cell(9, 5, utf8_decode($cal2), 1, 0, 'C', false); 
+    				$pdf->Cell(9, 5, utf8_decode($cal3), 1, 0, 'C', false); 
+					$pdf->Cell(12, 5, utf8_decode($prom), 1, 0, 'C', false);
+   				    $pdf->Cell(13, 5, '', 1, 0, 'C', false);
+    				$pdf->Cell(8, 5, '', 1, 0, 'C', false);
+    				$pdf->Cell(9.5, 5, '', 1, 0, 'C', false);
+    				$pdf->Cell(10.5, 5, '', 1, 0, 'C', false);
+    				$pdf->Cell(11, 5, '', 1, 0, 'C', false);
+    				$pdf->Cell(19, 5, '', 1, 0, 'C', false);
+    				$pdf->Cell(10, 5, '', 1, 0, 'C', false);
 
-
-
-				$pdf->SetFont('Courier', '', 10);
-				$pdf->Text(8, 150, utf8_decode('www.universidadsotavento.com'));
-											
-
+    				$pdf->Ln();
+				
+				$pdf->SetFont('Courier', '', 8);
+				$pdf->Text(65, 150, utf8_decode('Promedios'));
+				$pdf->Text(8, 155, utf8_decode('www.universidadsotavento.com'));
+				}
                 $pdf->Ln(1);
                 $pdf->SetXY(15, 250);
                 $pdf->SetFont('Arial', 'B', 20);
                 $pdf->Cell(120, 25, utf8_decode('BOLETA DE CALIFICACIONES'), 1, 0, 'C', 1);
+				$pdf->Cell(70, 25, utf8_decode(''), 1, 0, 'C', 1);	
+				$pdf->SetFont('Arial', 'B', 11);
+                $pdf->Text(135, 248, utf8_decode('* Los saldos estan sujetos a revisión.'));
+				$pdf->SetFont('Arial', 'BI', 10);
+				$pdf->Text(138, 255, utf8_decode('PERIODO:'));
+				$pdf->Text(150, 260, utf8_decode($fila['Periodo']));
+				$pdf->SetFont('Arial', '', 5.8);
+				$pdf->Text(138, 265, utf8_decode('Esta boleta no es valida si tiene raspaduras, manchones o correcciones.'));
+				$pdf->Text(138, 268, utf8_decode('Asi mismo no es documento oficial.'));
                 $pdf->SetXY(135, 250);
-                $pdf->Cell(70, 25, utf8_decode(''), 1, 0, 'C', 1);		
+                	
             }
         }
 
