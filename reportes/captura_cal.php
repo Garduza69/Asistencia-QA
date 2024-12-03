@@ -519,6 +519,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buscar'])) {
                         }
 
                         $disabled = $calificacionParcial > 0 ? "disabled" : ""; // Desactiva si el valor es mayor a 0
+                        if($calificacionParcial == 0){
+                            $calificacionParcial = null;
+                        }
                     ?>
                         <tr>
                             <td><?php echo $i + 1; ?></td>
