@@ -109,9 +109,6 @@ if (isset($_GET['email']) && isset($_GET['parcial'])){
     }
 
 
-}else {
-    // Si el token o el resultado no se recibieron por GET, muestra un mensaje de error
-    echo "Error: No se proporcionaron suficientes parámetros en la URL.";
 }
 ?>
 
