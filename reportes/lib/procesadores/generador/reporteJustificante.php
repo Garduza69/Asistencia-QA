@@ -34,6 +34,20 @@ $pdf = new PDFWithFooter();
 
 
 $pdf->SetTitle('Justificante', true);
+$matricula = $_GET['matricula'];
+$dia_seleccionado = $_GET['dia_seleccionado'];
+$mes = $_GET['mes'];
+$motivo = $_GET['motivo_seleccionado'];
+$fecha = $_GET['dia'];
+
+$consultaJustificacion = $db->query("UPDATE asistencia AS asis
+JOIN alumnos AS al ON asis.alumno_id = al.alumno_id
+SET asis.asistencia = 2
+WHERE MONTH(asis.fecha_alta) = '".$mes."'
+    AND DAY(asis.fecha_alta) = '".$dia_seleccionado."'
+    AND al.matricula = '".$matricula."';");
+
+$pdf->SetTitle('Justificante', true);
 
 $consultaEncabezado = $db->query("SELECT 
     al.matricula,
@@ -71,7 +85,7 @@ JOIN
 JOIN 
     facultades f ON gr.facultad_id = f.facultad_id
 JOIN 
-    asistencia asis ON asis.asistencia 
+    asistencia asis ON asis.alumno_id = al.alumno_id 
 JOIN 
     semestres s ON gr.semestre_id = s.semestre_id
 WHERE 
@@ -79,6 +93,7 @@ WHERE
     AND DAY(asis.fecha_alta) = '".$dia_seleccionado."'
     AND al.matricula =  '".$matricula."'
     AND gr.vigenciaSem = 1;");
+
 
 
 if($consultaEncabezado->num_rows > 0) {
