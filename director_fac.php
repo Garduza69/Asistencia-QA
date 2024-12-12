@@ -68,7 +68,7 @@ header("Pragma: no-cache");
         </div>
       <nav id="nav-menu-container">
         <ul class="nav-menu">
-		<li class="menu-has-children"><a href="">Inicio</a></li>
+		<li class="menu-has-children"><a href="interfaz_principal.php">Nuevo semestre</a></li>
           <li class="menu-has-children"><a href="">Justificantes</a>
             <ul>
                 <li><a href="reportes/Materias.php">Consultar Asistencia</a></li>
