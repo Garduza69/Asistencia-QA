@@ -76,6 +76,40 @@ $grupos = $db->query($queryGrupos);
         button:hover {
             background-color: #0056b3;
         }
+
+        .button-container {
+            display: flex; /* Activa flexbox */
+            align-items: center; /* Alinea los botones verticalmente al centro */
+            gap: 10px; /* Espacio entre los botones */
+            margin-top: 20px; /* Espacio adicional arriba del contenedor */
+        }
+
+        .button-container button,
+        .button-container a {
+            padding: 10px 20px; /* Ajusta el espacio interno del texto */
+            
+            border-radius: 4px; /* Bordes redondeados */
+            text-align: center; /* Centra el texto horizontalmente */
+            text-decoration: none; /* Elimina el subrayado de los enlaces */
+            color: white; /* Texto blanco */
+            border: none; /* Elimina el borde por defecto */
+            cursor: pointer;
+            background-color: #007bff; /* Fondo azul */
+            transition: background-color 0.3s;
+        }
+
+        .button-container button:hover,
+        .button-container a:hover {
+            background-color: #0056b3; /* Cambio de color al pasar el mouse */
+        }
+
+        .button-container button {
+            flex: 2; /* El botón "Buscar" ocupará más espacio horizontal */
+        }
+
+        .button-container a {
+            flex: 1; /* El botón "Regresar" ocupará menos espacio horizontal */
+        }
     </style>
 </head>
 
@@ -132,7 +166,12 @@ $grupos = $db->query($queryGrupos);
                 <option value="12">Diciembre</option>
             </select>
 
-            <button type="submit">Generar Lista</button>
+            
+            <div class="button-container">
+                <a href="../index.php">Regresar</a>
+                <button type="submit">Generar Lista</button>
+                
+            </div>
         </form>
     </div>
 </body>

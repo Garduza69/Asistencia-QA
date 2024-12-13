@@ -58,6 +58,40 @@ require('../conexion2.php');
             background-color: #0056b3;
         }
 
+        .button-container {
+            display: flex; /* Activa flexbox */
+            align-items: center; /* Alinea los botones verticalmente al centro */
+            gap: 10px; /* Espacio entre los botones */
+            margin-top: 20px; /* Espacio adicional arriba del contenedor */
+        }
+
+        .button-container button,
+        .button-container a {
+            padding: 10px 20px; /* Ajusta el espacio interno del texto */
+            
+            border-radius: 4px; /* Bordes redondeados */
+            text-align: center; /* Centra el texto horizontalmente */
+            text-decoration: none; /* Elimina el subrayado de los enlaces */
+            color: white; /* Texto blanco */
+            border: none; /* Elimina el borde por defecto */
+            cursor: pointer;
+            background-color: #007bff; /* Fondo azul */
+            transition: background-color 0.3s;
+        }
+
+        .button-container button:hover,
+        .button-container a:hover {
+            background-color: #0056b3; /* Cambio de color al pasar el mouse */
+        }
+
+        .button-container button {
+            flex: 2; /* El botón "Buscar" ocupará más espacio horizontal */
+        }
+
+        .button-container a {
+            flex: 1; /* El botón "Regresar" ocupará menos espacio horizontal */
+        }
+
         .seleccionar-dia {
             margin-bottom: 20px;
         }
@@ -151,7 +185,12 @@ require('../conexion2.php');
             <label for="motivo_seleccionado">Motivo de la Falta:</label>
             <input type="text" name="motivo_seleccionado" id="motivo_seleccionado" required>
         </div>            
-            <button type="button" id="boton-generar-lista">Actualizar y Generar Justificante</button>
+            
+            <div class="button-container">
+                <a href="../director_fac.php">Regresar</a>
+                <button type="button" id="boton-generar-lista">Actualizar y Generar Justificante</button>
+                
+            </div>
         </form>
     </div>
 

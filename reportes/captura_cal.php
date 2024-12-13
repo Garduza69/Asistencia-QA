@@ -229,6 +229,41 @@ $facultad = $db->query($fac);
         button:hover {
             background-color: #0056b3;
         }
+
+        .button-container {
+            display: flex; /* Activa flexbox */
+            justify-content: flex-start; /* Alinea los elementos al inicio */
+            gap: 10px; /* Espacio entre los botones */
+            margin-top: 20px; /* Espacio adicional arriba del contenedor */
+        }
+
+        .button-container button {
+            flex: 2; /* El botón "Buscar" ocupará más espacio */
+        }
+
+        .button-container a {
+            flex: 1; /* El botón "Regresar" ocupará menos espacio */
+            text-align: center; /* Centra el texto del enlace */
+            text-decoration: none; /* Elimina el subrayado del enlace */
+        }
+
+        /* Estilo para el botón */
+        a {
+            display: block;
+            width: 65px;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px; /* Espacio adicional arriba del botón */
+        }
+
+        a:hover {
+            background-color: #0056b3;
+        }
     </style>
 
 
@@ -370,7 +405,11 @@ $facultad = $db->query($fac);
                 </select>
             </div>
             
-            <button type="submit" name="buscar">Buscar</button>
+            <div class="button-container">
+                <a href="../docente.php">Regresar</a>
+                <button type="submit" name="buscar">Buscar</button>
+                
+            </div>
         </form>
 
         <?php
