@@ -1,16 +1,6 @@
 <?php
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$database = 'u712195824_sistema2';
-
-// Crear conexión
-$conexion = new mysqli($host, $username, $password, $database);
-
-// Verificar conexión
-if ($conexion->connect_error) {
-    die("Conexión fallida: " . $conexion->connect_error);
-}
+// Incluir el archivo de conexión
+include('conexion2.php');
 
 // Lógica para procesar la migración
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['semestre'])) {
