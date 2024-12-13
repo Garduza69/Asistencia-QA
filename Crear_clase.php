@@ -1,210 +1,147 @@
+<?php
+// Incluir la conexión desde el archivo conexion2.php
+include('conexion2.php'); // Asumiendo que el archivo conexion2.php contiene la conexión a la base de datos
+
+// Si el formulario ha sido enviado
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Recoger los datos del formulario
+    $semestre_id = $_POST['semestre_id'];
+    $facultad_id = $_POST['facultad_id'];
+    $grupo_id = $_POST['grupo_id'];
+    $materia_id = $_POST['materia_id'];
+    $profesor_id = $_POST['profesor_id'];
+    $hora_inicio = $_POST['hora_inicio'];
+    $hora_fin = $_POST['hora_fin'];
+
+    // Obtener el id_grupo utilizando clave_grupo
+    $resultado_grupo = $conexion->query("SELECT grupo_id FROM grupos WHERE clave_grupo = '$grupo_id'");
+    $grupo = $resultado_grupo->fetch_assoc();
+    $id_grupo = $grupo['grupo_id'];
+
+    // Insertar en la tabla new_sem
+    $sql_clase = "INSERT INTO new_sem (id_semestre, id_facultad, id_grupo, id_materia, id_profesor, Hora_inicio, Hora_fin)
+                  VALUES ('$semestre_id', '$facultad_id', '$id_grupo', '$materia_id', '$profesor_id', '$hora_inicio', '$hora_fin')";
+
+    if ($conexion->query($sql_clase) === TRUE) {
+        echo "Clase creada exitosamente.";
+    } else {
+        echo "Error: " . $sql_clase . "<br>" . $conexion->error;
+    }
+}
+
+// Obtener los datos necesarios para los select
+$semestres = $conexion->query("SELECT semestre_id, nombre FROM semestres");
+$facultades = $conexion->query("SELECT facultad_id, nombre FROM facultades");
+$grupos = $conexion->query("SELECT clave_grupo FROM grupos");
+$materias = $conexion->query("SELECT materia_id, nombre FROM materias");
+$profesores = $conexion->query("SELECT profesor_id, CONCAT(nombre, ' ', primer_apellido, ' ', segundo_apellido) AS nombre_completo FROM profesores");
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Clases</title>
+    <link rel="stylesheet" href="bdd.css">
     <style>
-        /* CSS para un diseño moderno */
-        body {
-            background-color: white;
-            font-family: Arial, sans-serif;
-            color: black;
-            margin: 0;
-            padding: 20px;
+        input[type="text"], input[type="time"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
         }
-
-        form {
-            background-color: #ffffff;
-            color: rgb(0, 47, 92);
-            border-radius: 10px;
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        input[type="date"],
         select {
             width: 100%;
             padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            margin-bottom: 10px;
             box-sizing: border-box;
         }
-
-        input[type="checkbox"] {
-            margin-right: 10px;
-        }
-
-        input[type="submit"] {
-            background-color: rgb(0, 47, 92);
-            color: #ffffff;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #003366;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        select, input[type="date"] {
-            background-color: #f9f9f9;
-            color: rgb(0, 47, 92);
-        }
     </style>
+    <script>
+        // Función para filtrar opciones en un select
+        function filtrarOpciones(inputId, selectId) {
+            var input, filter, select, options, i;
+            input = document.getElementById(inputId);
+            filter = input.value.toUpperCase();
+            select = document.getElementById(selectId);
+            options = select.getElementsByTagName("option");
+
+            for (i = 0; i < options.length; i++) {
+                if (options[i].text.toUpperCase().indexOf(filter) > -1) {
+                    options[i].style.display = "";
+                } else {
+                    options[i].style.display = "none";
+                }
+            }
+        }
+    </script>
 </head>
 <body>
-    <?php
-    // Cambia 'nombre_base_datos' por el nombre real de tu base de datos.
-    $host = 'localhost'; // Cambia si es necesario
-    $username = 'root'; // Cambia si es necesario
-    $password = ''; // Cambia si es necesario
-    $database = 'u712195824_sistema2'; // Cambia por el nombre de tu base de datos
 
-    // Crear conexión
-    $conexion = new mysqli($host, $username, $password, $database);
+    <h2>Crear Clases</h2>
 
-    // Verificar conexión
-    if ($conexion->connect_error) {
-        die("Conexión fallida: " . $conexion->connect_error);
-    }
+    <form action="Crear_clase.php" method="POST"> <!-- Cambiado a crear_clase.php -->
+    <!-- Selección de semestre -->
+    <label for="semestre_id">Seleccionar Semestre:</label>
+    <input type="text" id="buscarSemestre" onkeyup="filtrarOpciones('buscarSemestre', 'semestre_id')" placeholder="Buscar semestre...">
+    <select id="semestre_id" name="semestre_id" required>
+        <option value="">Selecciona un semestre</option>
+        <?php while ($semestre = $semestres->fetch_assoc()): ?>
+            <option value="<?php echo $semestre['semestre_id']; ?>"><?php echo $semestre['nombre']; ?></option>
+        <?php endwhile; ?>
+    </select><br><br>
 
-    // Si el formulario ha sido enviado
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Recoger los datos del formulario
-        $clave_grupo = $_POST['grupo_id']; // Usamos clave_grupo
-        $materia_id = $_POST['materia_id'];
-        $fecha_inicio = $_POST['fecha_inicio'];
-        $fecha_fin = $_POST['fecha_fin'];
-        $dias_clase = $_POST['dias_clase']; // Array de días seleccionados
+    <!-- Selección de facultad -->
+    <label for="facultad_id">Seleccionar Facultad:</label>
+    <input type="text" id="buscarFacultad" onkeyup="filtrarOpciones('buscarFacultad', 'facultad_id')" placeholder="Buscar facultad...">
+    <select id="facultad_id" name="facultad_id" required>
+        <option value="">Selecciona una facultad</option>
+        <?php while ($facultad = $facultades->fetch_assoc()): ?>
+            <option value="<?php echo $facultad['facultad_id']; ?>"><?php echo $facultad['nombre']; ?></option>
+        <?php endwhile; ?>
+    </select><br><br>
 
-        // Obtener el grupo_id basado en el clave_grupo
-        $grupo_result = $conexion->query("SELECT grupo_id FROM grupos WHERE clave_grupo = '$clave_grupo'");
-        
-        if ($grupo_result) {
-            $grupo_data = $grupo_result->fetch_assoc();
-            $grupo_id = $grupo_data['grupo_id']; // Obtener el grupo_id
-            
-            // Mostrar el grupo ID seleccionado para depuración
-            echo "Grupo ID seleccionado: $grupo_id<br>";
+    <!-- Selección de grupo -->
+    <label for="grupo_id">Seleccionar Grupo:</label>
+    <input type="text" id="buscarGrupo" onkeyup="filtrarOpciones('buscarGrupo', 'grupo_id')" placeholder="Buscar grupo...">
+    <select id="grupo_id" name="grupo_id" required>
+        <option value="">Selecciona un grupo</option>
+        <?php while ($grupo = $grupos->fetch_assoc()): ?>
+            <option value="<?php echo $grupo['clave_grupo']; ?>"><?php echo $grupo['clave_grupo']; ?></option>
+        <?php endwhile; ?>
+    </select><br><br>
 
-            // Obtener los alumnos del grupo usando el grupo_id
-            $alumnos = $conexion->query("SELECT alumno_id FROM alumnos WHERE grupo_id = '$clave_grupo'"); // Cambiamos a clave_grupo
+    <!-- Selección de materia -->
+    <label for="materia_id">Seleccionar Materia:</label>
+    <input type="text" id="buscarMateria" onkeyup="filtrarOpciones('buscarMateria', 'materia_id')" placeholder="Buscar materia...">
+    <select id="materia_id" name="materia_id" required>
+        <option value="">Selecciona una materia</option>
+        <?php while ($materia = $materias->fetch_assoc()): ?>
+            <option value="<?php echo $materia['materia_id']; ?>"><?php echo $materia['nombre']; ?></option>
+        <?php endwhile; ?>
+    </select><br><br>
 
-            // Mostrar cuántos alumnos se han encontrado
-            if ($alumnos) {
-                $total_alumnos = $alumnos->num_rows;
-                echo "Total de alumnos en el grupo $grupo_id: $total_alumnos<br>";
-                
-                // Mostrar los IDs de los alumnos encontrados
-                if ($total_alumnos > 0) {
-                    echo "Alumnos encontrados:<br>";
-                    while ($alumno = $alumnos->fetch_assoc()) {
-                        echo "Alumno ID: " . $alumno['alumno_id'] . "<br>";
-                    }
-                }
-            } else {
-                echo "Error al realizar la consulta: " . $conexion->error . "<br>";
-            }
+    <!-- Selección de profesor -->
+    <label for="profesor_id">Seleccionar Profesor:</label>
+    <input type="text" id="buscarProfesor" onkeyup="filtrarOpciones('buscarProfesor', 'profesor_id')" placeholder="Buscar profesor...">
+    <select id="profesor_id" name="profesor_id" required>
+        <option value="">Selecciona un profesor</option>
+        <?php while ($profesor = $profesores->fetch_assoc()): ?>
+            <option value="<?php echo $profesor['profesor_id']; ?>"><?php echo $profesor['nombre_completo']; ?></option>
+        <?php endwhile; ?>
+    </select><br><br> 
 
-            // Lista para almacenar las fechas a insertar
-            $fechas_a_insertar = [];
-            
-            // Generar fechas para las clases
-            $start = new DateTime($fecha_inicio);
-            $end = new DateTime($fecha_fin);
-            $end = $end->modify('+1 day'); // Se incluye el último día
-            $period = new DatePeriod($start, new DateInterval('P1D'), $end);
+    <!-- Selección de horario -->
+    <label for="hora_inicio">Hora de Inicio:</label>
+    <input type="time" id="hora_inicio" name="hora_inicio" required><br><br>
 
-            // Verificar cada fecha
-            foreach ($period as $date) {
-                if (in_array($date->format('l'), $dias_clase)) {
-                    $fechas_a_insertar[] = $date->format('Y-m-d');
-                }
-            }
+    <label for="hora_fin">Hora de Fin:</label>
+    <input type="time" id="hora_fin" name="hora_fin" required><br><br>
 
-            // Insertar asistencia
-            if ($total_alumnos > 0) { // Verificar si hay alumnos
-                // Resetear el puntero del resultado de la consulta de alumnos
-                $alumnos->data_seek(0); // Resetea el puntero del resultado para volver a recorrerlo
-                
-                while ($alumno = $alumnos->fetch_assoc()) {
-                    $alumno_id = $alumno['alumno_id'];
-                    
-                    foreach ($fechas_a_insertar as $fecha_alta) {
-                        $sql_asistencia = "INSERT INTO asistencia (asistencia, alumno_id, materia_id, usuario_alta, fecha_alta)
-                                           VALUES (NULL, '$alumno_id', '$materia_id', 'ADMIN', '$fecha_alta')";
-                        if (!$conexion->query($sql_asistencia)) {
-                            echo "Error en la inserción de asistencia para Alumno ID: $alumno_id, Fecha: $fecha_alta - " . $conexion->error . "<br>"; // Muestra el error específico
-                        } else {
-                            echo "Insertado: Alumno ID: $alumno_id, Materia ID: $materia_id, Fecha Alta: $fecha_alta<br>"; // Muestra la inserción
-                        }
-                    }
-                }
-            } else {
-                echo "No hay alumnos en el grupo seleccionado.";
-            }
-        } else {
-            echo "Error al buscar el grupo: " . $conexion->error . "<br>";
-        }
+    <input type="submit" value="Crear Clase">
+</form>
 
-        echo "Proceso completado.";
-    } else {
-        // Obtener datos para las selecciones del formulario
-        $grupos = $conexion->query("SELECT clave_grupo FROM grupos");
-        $materias = $conexion->query("SELECT materia_id, nombre FROM materias");
-        $dias = ['Monday' => 'Lunes', 'Tuesday' => 'Martes', 'Wednesday' => 'Miércoles', 'Thursday' => 'Jueves', 'Friday' => 'Viernes'];
-    ?>
 
-    <form method="POST" action="">
-        <label for="grupo_id">Seleccione el grupo:</label>
-        <select name="grupo_id" id="grupo_id" required>
-            <?php while ($grupo = $grupos->fetch_assoc()) : ?>
-                <option value="<?php echo $grupo['clave_grupo']; ?>"><?php echo $grupo['clave_grupo']; ?></option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="materia_id">Seleccione la materia:</label>
-        <select name="materia_id" id="materia_id" required>
-            <?php while ($materia = $materias->fetch_assoc()) : ?>
-                <option value="<?php echo $materia['materia_id']; ?>"><?php echo $materia['nombre']; ?></option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="fecha_inicio">Fecha de inicio:</label>
-        <input type="date" name="fecha_inicio" required>
-
-        <label for="fecha_fin">Fecha de fin:</label>
-        <input type="date" name="fecha_fin" required>
-
-        <label for="dias_clase">Días de clase:</label><br>
-        <?php foreach ($dias as $key => $value) : ?>
-            <input type="checkbox" name="dias_clase[]" value="<?php echo $key; ?>"> <?php echo $value; ?><br>
-        <?php endforeach; ?>
-
-        <input type="submit" value="Crear Clases">
-    </form>
-
-    <?php
-    }
-    ?>
 </body>
 </html>

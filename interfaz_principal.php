@@ -20,25 +20,10 @@
     </div>
 
     <div class="menu-item">
-      <a href="new_sem2.php">
-        <img src="icons/book.png" alt="Materia">
-        <span>Materia</span>
-      </a>
-    </div>
-
-    <div class="menu-item">
-      <a href="migracion_sem.php">
-        <img src="icons/enviar.png" alt="Horario">
-        <span>Migración</span>
-      </a>
-    </div>
-    
-
-    <div class="menu-item">
       <a href="Crear_clase.php">
         <img src="icons/calendar.png" alt="Horario">
         <span>Horario</span>
-      </a>
+      </a> 
     </div>
 
     
